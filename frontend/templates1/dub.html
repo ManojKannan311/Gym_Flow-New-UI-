@@ -1,0 +1,430 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container-fluid p-4">
+    <div class="row">
+
+
+        <div class="card mb-3 shadow-sm" style="border-radius:12px;">
+            <div class="card-body">
+
+                <div class="row g-2 align-items-center">
+
+                    <!-- LEFT: Branch -->
+                    <div class="col-12 col-lg-4">
+                        <select id="dash_branch" class="form-select">
+                            <option value="">All Branches</option>
+                        </select>
+                    </div>
+
+                    <!-- CENTER: Range Buttons -->
+                    <div class="col-12 col-lg-4 d-flex justify-content-lg-center">
+                        <div class="btn-group w-100 w-lg-auto" role="group" aria-label="Range filter">
+                            <button class="btn btn-outline-primary dash-range active"
+                                data-range="current">Current</button>
+                            <button class="btn btn-outline-primary dash-range" data-range="last">Last</button>
+                            <button class="btn btn-outline-primary dash-range" data-range="all">All</button>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: Info -->
+                    <div class="col-12 col-lg-4 d-flex justify-content-lg-end">
+                        <div class="small text-muted text-lg-end">
+                            Expiring limit: <b>3 days</b><br>
+                            <span id="dash_updated">Updated: -</span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row g-3 mb-3">
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card dash-card h-100 shadow-sm" data-link="/members/">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Total Members</div>
+                        <h3 id="c_total_members" class="mb-0">0</h3>
+                    </div>
+                    <i class="bi bi-people fs-2 text-primary"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card dash-card h-100 shadow-sm" data-link="/members/?status=active">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Active Members</div>
+                        <div class="fs-3 fw-bold" id="c_active_members">0</div>
+                    </div>
+                    <i class="bi bi-check-circle fs-2 text-success"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card dash-card h-100 shadow-sm" data-link="/renewals/?status=expiring">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Expiring Soon (3 days)</div>
+                        <div class="fs-3 fw-bold" id="c_expiring_members">0</div>
+                    </div>
+                    <i class="bi bi-exclamation-triangle fs-2 text-warning"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card dash-card h-100 shadow-sm" data-link="/unpaid-members/?status=expired">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Expired</div>
+                        <div class="fs-3 fw-bold" id="c_expired_members">0</div>
+                    </div>
+                    <i class="bi bi-x-circle fs-2 text-danger"></i>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3 mb-3">
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card dash-card h-100 shadow-sm" data-link="#">
+                <div class="card-body">
+                    <div class="text-muted small">Revenue (Selected Range)</div>
+                    <div class="fs-3 fw-bold">₹ <span id="c_revenue">0</span></div>
+                    <div class="text-muted small mt-1">
+                        Cash: ₹<span id="c_cash">0</span> • UPI: ₹<span id="c_upi">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card dash-card h-100 shadow-sm" data-link="#">
+                <div class="card-body">
+                    <div class="text-muted small">New Members</div>
+                    <div class="fs-3 fw-bold" id="c_new_members">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card dash-card h-100 shadow-sm" data-link="#">
+                <div class="card-body">
+                    <div class="text-muted small">Payments Count</div>
+                    <div class="fs-3 fw-bold" id="c_renewals">0</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row g-3">
+
+        <!-- Expiring -->
+        <div class="col-lg-6">
+          <div class="card shadow-sm border-0 h-100">
+      
+            <!-- Header -->
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+              <h6 class="mb-0 fw-semibold">Expiring Soon (Top 10)</h6>
+              <a class="btn btn-outline-primary btn-sm" href="/renewals/?status=expiring">View All</a>
+            </div>
+      
+            <!-- Table -->
+            <div class="card-body p-0">
+              <div class="table-responsive premium-table">
+                <table class="table align-middle mb-0">
+                  <thead class="table">
+                    <tr>
+                      <th>Name</th>
+                      <th>Branch</th>
+                      <th>Expiry</th>
+                      <th>Days</th>
+                    </tr>
+                  </thead>
+                  <tbody id="t_expiring"></tbody>
+                </table>
+              </div>
+            </div>
+      
+          </div>
+        </div>
+      
+        <!-- Recent Payments -->
+        <div class="col-lg-6">
+          <div class="card shadow-sm border-0 h-100">
+      
+            <!-- Header -->
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+              <h6 class="mb-0 fw-semibold">Recent Payments (Top 10)</h6>
+              <a class="btn btn-outline-primary btn-sm" href="/paid-members/">View All</a>
+            </div>
+      
+            <!-- Table -->
+            <div class="card-body p-0">
+              <div class="table-responsive premium-table">
+                <table class="table align-middle mb-0 table-hover">
+                  <thead class="">
+                    <tr>
+                      <th>Name</th>
+                      <th>Branch</th>
+                      <th>Amount</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody id="t_recent"></tbody>
+                </table>
+              </div>
+            </div>
+      
+          </div>
+        </div>
+      
+      </div>
+      
+
+
+</div>
+
+
+<!-- Dashboard Cards -->
+<!-- <div class="container-fluid p-4">
+    <div class="row g-4">
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex justify-content-between">
+                    <div>
+                        <h6>Total Members</h6>
+                        {% if total_members <= 9 %}
+                            <h3>0{{ total_members }}</h3>
+                        {% else %}
+                            <h3>{{ total_members }}</h3>
+                        {% endif %}                    
+                        <small class="text-success">+10% last year</small>
+                    </div>
+                    <div class="card-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex justify-content-between">
+                    <div>
+                        <h6>Active Members</h6>
+                        {% if active_count <= 9 %}
+                        <h3>0{{ active_count }}</h3>
+                        {% else %}
+                            <h3>{{ active_count }}</h3>
+                        {% endif %}  
+                        <small class="text-success">+2.15% last month</small>
+                    </div>
+                    <div class="card-icon">
+                        <i class="bi bi-person-x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex justify-content-between">
+                    <div>
+                        <h6>Expired</h6>
+                        {% if expired_count <= 9 %}
+                        <h3>0{{ expired_count }}</h3>
+                        {% else %}
+                            <h3>{{ expired_count }}</h3>
+                        {% endif %} 
+                        <small class="text-success">+5.15% last month</small>
+                    </div>
+                    <div class="card-icon">
+                        <i class="bi bi-kanban"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex justify-content-between">
+                    <div>
+                        <h6>Monthly Revenue</h6>
+                        {% if monthly_collection <= 9 %}
+                        <h3>0{{ monthly_collection }}</h3>
+                        {% else %}
+                            <h3>{{ monthly_collection }}</h3>
+                        {% endif %} 
+                        <small class="text-danger">-5.5% last month</small>
+                    </div>
+                    <div class="card-icon">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div> -->
+
+</div>
+
+<script>
+    let DASH_RANGE = "current";
+
+    function fmtINR(x) {
+        try { return Number(x || 0).toLocaleString("en-IN"); }
+        catch (e) { return x || 0; }
+    }
+
+    function setUpdatedNow() {
+        const now = new Date();
+        document.getElementById("dash_updated").innerText =
+            `Updated: ${now.toLocaleTimeString()}`;
+    }
+
+    function buildBranchDropdown(branches) {
+        const sel = document.getElementById("dash_branch");
+        const current = sel.value;
+
+        sel.innerHTML = `<option value="">All Branches</option>`;
+        branches.forEach(b => {
+            const opt = document.createElement("option");
+            opt.value = b.id;
+            opt.textContent = b.name;
+            sel.appendChild(opt);
+        });
+
+        // try keep selection
+        if (current) sel.value = current;
+    }
+
+    function loadDashboardStats() {
+        const branch = document.getElementById("dash_branch").value || "";
+        const url = `/dashboard/stats/?range=${DASH_RANGE}&branch=${branch}`;
+
+        $.ajax({
+            url: url,
+            type: "GET",
+            dataType: "json",
+            success: function (res) {
+                if (!res.success) return;
+
+                // branches dropdown
+                buildBranchDropdown(res.branches || []);
+
+                // cards
+                const c = res.cards;
+                $("#c_total_members").text(c.total_members);
+                $("#c_active_members").text(c.active_members);
+                $("#c_expiring_members").text(c.expiring_members);
+                $("#c_expired_members").text(c.expired_members);
+
+                $("#c_revenue").text(fmtINR(c.revenue));
+                $("#c_cash").text(fmtINR(c.cash_total));
+                $("#c_upi").text(fmtINR(c.upi_total));
+
+                $("#c_new_members").text(c.new_members);
+                $("#c_renewals").text(c.renewals);
+                let i = 0   
+                // tables
+                const exp = res.tables.expiring_list || [];
+                const recent = res.tables.recent_renewals || [];
+
+                let expHtml = "";
+                if (exp.length === 0) {
+                    expHtml = `<tr><td colspan="4" class="text-center text-muted">No expiring members 🎉</td></tr>`;
+                } else {
+                    exp.forEach(m => {
+                        expHtml += `
+              <tr>
+                <td>${m.name}</td>
+                <td>${m.branch}</td>
+                <td>${m.expiry}</td>
+                <td><span class="badge bg-warning text-dark">${m.days_left} day</span></td>
+              </tr>
+            `;
+                    });
+                }
+                $("#t_expiring").html(expHtml);
+
+                let recHtml = "";
+                if (recent.length === 0) {
+                    recHtml = `<tr><td colspan="4" class="text-center text-muted">No payments</td></tr>`;
+                } else {
+                    recent.forEach(p => {
+                        recHtml += `
+              <tr>
+                
+                <td class="py-3" >${p.name}</td>
+                <td class="py-3" >${p.branch}</td>
+                <td class="py-3" >₹${fmtINR(p.amount)}</td>
+                <td class="py-3" >${p.date}</td>
+              </tr>
+            `;
+                    });
+                }
+                $("#t_recent").html(recHtml);
+
+                setUpdatedNow();
+            }
+        });
+    }
+
+    // Range buttons
+    $(document).on("click", ".dash-range", function () {
+        $(".dash-range").removeClass("active");
+        $(this).addClass("active");
+        DASH_RANGE = $(this).data("range");
+        loadDashboardStats();
+    });
+
+    // Branch change
+    $(document).on("change", "#dash_branch", function () {
+        loadDashboardStats();
+    });
+
+    // Card click (optional)
+    $(document).on("click", ".dash-card", function () {
+        const link = $(this).data("link");
+        const branch = $("#dash_branch").val();
+        if (branch) {
+            // append branch filter to link
+            const joiner = link.includes("?") ? "&" : "?";
+            window.location.href = `${link}${joiner}branch=${branch}`;
+        } else {
+            window.location.href = link;
+        }
+    });
+
+    // Initial load
+    $(document).ready(function () {
+        loadDashboardStats();
+    });
+
+    $(document).on("click", ".dash-card", function () {
+        const link = $(this).data("link");
+        if (link) window.location.href = link;
+    });
+
+</script>
+
+
+
+
+{% endblock %}

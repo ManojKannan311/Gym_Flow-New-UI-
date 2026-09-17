@@ -1,0 +1,598 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+:root{
+  --gf-primary:#2f6fed;--gf-primary-dark:#245bd0;--gf-primary-soft:#edf4ff;
+  --gf-page:#f4f7fb;--gf-border:#e4e9f2;--gf-text:#172033;--gf-muted:#7d8aa5;
+  --gf-radius:18px;--gf-shadow:0 8px 24px rgba(28,48,86,.07)
+}
+.paid-members-page{background:var(--gf-page);color:var(--gf-text);padding:22px 18px 34px;min-height:calc(100vh - 70px)}
+.paid-members-page .page-header,.paid-members-page .filter-card,.paid-members-page .members-card{
+  background:#fff;border:1px solid var(--gf-border);border-radius:var(--gf-radius);box-shadow:var(--gf-shadow)
+}
+.paid-members-page .page-header{padding:22px 24px;margin-bottom:18px}
+.paid-members-page .eyebrow{display:flex;align-items:center;gap:9px;color:var(--gf-primary);
+  font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
+.paid-members-page .eyebrow i,.paid-members-page .section-icon{
+  width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;
+  background:var(--gf-primary-soft);color:var(--gf-primary);border-radius:10px
+}
+.paid-members-page .page-title{margin:0;font-size:24px;font-weight:750;letter-spacing:-.02em}
+.paid-members-page .page-subtitle{margin:4px 0 0;color:var(--gf-muted);font-size:14px}
+.paid-members-page .collection-box{display:flex;align-items:center;gap:12px;padding-left:22px;
+  border-left:1px solid var(--gf-border);min-width:190px}
+.paid-members-page .collection-icon{width:42px;height:42px;border-radius:12px;background:#eaf9f1;
+  color:#21945d;display:flex;align-items:center;justify-content:center;font-size:18px}
+.paid-members-page .collection-label{font-size:10px;color:var(--gf-muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.paid-members-page .collection-value{font-size:21px;font-weight:800;color:#21945d;line-height:1.2;margin-top:3px}
+.paid-members-page .filter-card{padding:20px;margin-bottom:18px}
+.paid-members-page .section-heading{display:flex;align-items:center;gap:10px;margin-bottom:17px}
+.paid-members-page .section-heading h6{margin:0;font-weight:750;font-size:15px}
+.paid-members-page .section-heading p{margin:2px 0 0;color:var(--gf-muted);font-size:12px}
+.paid-members-page .form-label{display:block;color:#8793a9;font-size:12px;font-weight:650;margin-bottom:7px}
+.paid-members-page .form-control,.paid-members-page .form-select{
+  min-height:44px;border:1px solid #dfe5ef;border-radius:11px;color:#27334a;background:#fff;box-shadow:none
+}
+.paid-members-page .form-control:focus,.paid-members-page .form-select:focus{
+  border-color:#8db2ff;box-shadow:0 0 0 3px rgba(47,111,237,.10)
+}
+.paid-members-page .form-control::placeholder{color:#aeb8ca}
+.paid-members-page .btn-primary{background:var(--gf-primary);border-color:var(--gf-primary);
+  border-radius:11px;font-weight:650;padding:10px 16px}
+.paid-members-page .btn-primary:hover{background:var(--gf-primary-dark);border-color:var(--gf-primary-dark)}
+.paid-members-page .reset-btn{border-radius:11px;padding:10px 16px;font-weight:600;border-color:#dce4ef}
+.paid-members-page .members-card{overflow:hidden}
+.paid-members-page .members-card-header{padding:18px 20px;border-bottom:1px solid var(--gf-border);
+  display:flex;align-items:center;justify-content:space-between;gap:12px}
+.paid-members-page .members-card-header h6{margin:0;font-weight:750;font-size:15px}
+.paid-members-page .directory-note{display:block;color:var(--gf-muted);font-size:12px;margin-top:3px}
+.paid-members-page .paid-chip{padding:7px 10px;border-radius:999px;background:#eaf9f1;color:#21945d;
+  font-size:11px;font-weight:750;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.paid-members-page .paid-chip:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.paid-members-page .table-wrap{overflow-x:auto}
+.paid-members-page table{margin:0!important}
+.paid-members-page thead th{background:#f8faff;color:#8793a9!important;border-bottom:1px solid var(--gf-border);
+  font-size:11px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;padding:14px 16px!important}
+.paid-members-page tbody td{border-color:#edf1f6;color:#344057;font-size:13px;padding:14px 16px!important;vertical-align:middle}
+.paid-members-page tbody tr:hover{background:#fbfcff}
+.paid-members-page .member-name{color:#1d2940;font-weight:700;line-height:1.2}
+.paid-members-page .member-id{display:block;color:var(--gf-muted);font-size:11px;margin-top:3px}
+.paid-members-page .member-avatar{width:42px;height:42px;flex:0 0 42px;border-radius:12px!important;
+  border:0!important;background:var(--gf-primary-soft)!important;color:var(--gf-primary);font-weight:750}
+.paid-members-page .amount{font-weight:800;color:#21945d;font-size:14px}
+.paid-members-page .action-btn{width:35px;height:35px;padding:0;display:inline-flex;align-items:center;
+  justify-content:center;border-radius:9px;background:#fff;border:1px solid #e1e7f0;color:#63708a}
+.paid-members-page .action-btn:hover{border-color:#b9cdf5;color:var(--gf-primary);background:var(--gf-primary-soft)}
+.paid-members-page .empty-state{padding:48px!important;text-align:center;color:var(--gf-muted)}
+.paid-members-page .mobile-member-card{background:#fff;border:1px solid var(--gf-border);
+  border-radius:16px;box-shadow:var(--gf-shadow)}
+.paid-members-page .mobile-detail{color:#69758d;font-size:12px;line-height:1.9}
+.paid-members-page .mobile-detail strong{color:#344057}
+.paid-members-page .mobile-actions .btn{min-height:46px;border:1px solid #e1e7f0;border-radius:11px!important;
+  color:#59677f;background:#fff;font-weight:650}
+.modal-content{border:0;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(20,36,70,.18)}
+.modal-header{border-bottom:1px solid #edf1f6;padding:18px 22px}
+.modal-footer{border-top:1px solid #edf1f6;padding:14px 22px}
+.modal-body{padding:22px}
+@media(max-width:767.98px){
+  .paid-members-page{padding:14px 10px 26px}
+  .paid-members-page .page-header{padding:18px}
+  .paid-members-page .page-title{font-size:20px}
+  .paid-members-page .collection-box{border-left:0;border-top:1px solid var(--gf-border);
+    padding:14px 0 0;margin-top:15px}
+  .paid-members-page .filter-card{padding:16px}
+  .paid-members-page .members-card-header{padding:16px}
+}
+</style>
+
+
+<div class="paid-members-page container-fluid">
+  <div class="page-header">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+      <div>
+        <div class="eyebrow"><i class="bi bi-wallet2"></i> Payment Management</div>
+        <h1 class="page-title">Paid Members</h1>
+        <p class="page-subtitle">Members who made payments in the selected month.</p>
+      </div>
+      {% if request.user.role == "ADMIN" %}
+      <div class="collection-box">
+        <div class="collection-icon"><i class="bi bi-cash-stack"></i></div>
+        <div>
+          <div class="collection-label">Total Collection</div>
+          <div class="collection-value">₹ {{ total_collection }}</div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="filter-card">
+    <div class="section-heading">
+      <span class="section-icon"><i class="bi bi-funnel-fill"></i></span>
+      <div>
+        <h6>Search &amp; Filter</h6>
+        <p>Review payments by member, month, year or branch.</p>
+      </div>
+    </div>
+
+    <form method="get">
+      <div class="row g-3 align-items-end">
+        <div class="col-12 col-lg-3">
+          <label class="form-label">Search Member</label>
+          <input class="form-control" name="q" value="{{ q }}" placeholder="Search name or phone">
+        </div>
+        <div class="col-6 col-lg-2">
+          <label class="form-label">Month</label>
+          <select class="form-select" name="month">
+            {% for m in "123456789101112"|make_list %}{% endfor %}
+            {% for m in months %}{% endfor %}
+            <option value="1" {% if month == 1 %}selected{% endif %}>Jan</option>
+            <option value="2" {% if month == 2 %}selected{% endif %}>Feb</option>
+            <option value="3" {% if month == 3 %}selected{% endif %}>Mar</option>
+            <option value="4" {% if month == 4 %}selected{% endif %}>Apr</option>
+            <option value="5" {% if month == 5 %}selected{% endif %}>May</option>
+            <option value="6" {% if month == 6 %}selected{% endif %}>Jun</option>
+            <option value="7" {% if month == 7 %}selected{% endif %}>Jul</option>
+            <option value="8" {% if month == 8 %}selected{% endif %}>Aug</option>
+            <option value="9" {% if month == 9 %}selected{% endif %}>Sep</option>
+            <option value="10" {% if month == 10 %}selected{% endif %}>Oct</option>
+            <option value="11" {% if month == 11 %}selected{% endif %}>Nov</option>
+            <option value="12" {% if month == 12 %}selected{% endif %}>Dec</option>
+          </select>
+        </div>
+        <div class="col-6 col-lg-2">
+          <label class="form-label">Year</label>
+          <input type="number" class="form-control" name="year" value="{{ year }}" min="2020" max="2100">
+        </div>
+        <div class="col-12 col-lg-3">
+          <label class="form-label">Branch</label>
+          <select class="form-select" name="branch">
+            <option value="">All Branches</option>
+            {% for b in branches %}
+              <option value="{{ b.id }}" {% if branch_id == b.id|stringformat:"s" %}selected{% endif %}>{{ b.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-lg-2 d-flex justify-content-end gap-2">
+          <a class="btn btn-outline-secondary reset-btn" href="{% url 'paid_members_page' %}">Reset</a>
+          <button class="btn btn-primary" type="submit"><i class="bi bi-search me-1"></i> Filter</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+    <!-- Table -->
+  <div class="members-card d-none d-md-block">
+    <div class="members-card-header">
+      <div>
+        <h6><i class="bi bi-receipt me-2 text-primary"></i>Payment Directory</h6>
+        <span class="directory-note">Members with recorded payments for the selected period.</span>
+      </div>
+      <span class="paid-chip">Paid Records</span>
+    </div>
+    <div class="table-wrap">
+      <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th class="fw-semibold text-muted" >#</th>
+                <th class="fw-semibold text-muted" >Name</th>
+                <th class="fw-semibold text-muted" >Phone</th>
+                <th class="fw-semibold text-muted" >Branch</th>
+                <th class="fw-semibold text-muted" >Total Paid</th>
+                <th class="fw-semibold text-muted" >Last Payment</th>
+                <th class="fw-semibold text-muted" >Action</th>
+              </tr>
+            </thead>
+  
+            <tbody>
+              {% for r in paid_members %}
+              <tr>
+                  <td class="py-3">{{ forloop.counter }}</td>
+              
+                  <!-- Name + Photo -->
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      {% if r.photo %}
+                        <img src="{{ r.photo.url }}" alt="{{ r.name }}" class="member-avatar" style="object-fit:cover;">
+                      {% else %}
+                        <div class="member-avatar d-flex align-items-center justify-content-center">
+                          {{ r.name|slice:":1"|upper }}
+                        </div>
+                      {% endif %}
+                      <div>
+                        <div class="member-name">{{ r.name }}</div>
+                        <span class="member-id">ID: {{ r.admission_number }}</span>
+                      </div>
+                    </div>
+                  </td>
+              
+                  <td class="py-3">{{ r.phone }}</td>
+                  <td class="py-3">{{ r.branch.name }}</td>
+                  <td><span class="amount">₹{{ r.total_paid|default:0 }}</span></td>
+                  <td class="py-3">
+                      {{ r.last_payment|date:"Y-m-d" }}
+                  </td>
+              
+                  <td class="py-3">
+                      <button type="button"
+                              class="btn btn-outline-secondary btn-sm"
+                              onclick="openMemberDetails('{{ r.id }}')">
+                          <i class="bi bi-eye"></i>
+                      </button>
+                  </td>
+              </tr>
+              {% empty %}
+              <tr>
+                  <td colspan="7" class="empty-state">
+                      No paid members found for this month
+                  </td>
+              </tr>
+              {% endfor %}
+              </tbody>
+  
+      </table>
+    </div>
+  </div>
+
+
+    <!-- MOBILE VIEW -->
+<div class="d-block d-md-none">
+
+  {% for r in paid_members %}
+  <div class="mobile-member-card mb-3">
+    <div class="card-body p-3">
+
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center">
+
+        <!-- Profile -->
+        <div class="d-flex align-items-center gap-2">
+          {% if r.photo %}
+          <img src="{{ r.photo.url }}"
+               width="50" height="50"
+               class="member-avatar"
+               style="object-fit: cover;">
+          {% else %}
+          <div class="rounded-circle border d-flex align-items-center justify-content-center"
+               style="width:50px;height:50px;background:#f1f3f5;font-weight:600;">
+            {{ r.name|slice:":1"|upper }}
+          </div>
+          {% endif %}
+
+          <div>
+            <div class="fw-semibold" style="font-size:15px;">
+              {{ r.name }}
+            </div>
+            <small class="text-muted">
+              ID: {{ r.admission_number }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Amount -->
+        <div class="text-end">
+          <div class="amount">
+            ₹{{ r.total_paid|default:0 }}
+          </div>
+          <small class="text-muted">Paid</small>
+        </div>
+
+      </div>
+
+      <hr class="my-2">
+
+      <!-- Details -->
+      <div class="mobile-detail">
+        <div><strong class="text-dark">📞</strong> {{ r.phone }}</div>
+        <div><strong class="text-dark">🏢</strong> {{ r.branch.name }}</div>
+        <div>
+          <strong class="text-dark">📅 Last Payment:</strong>
+          {{ r.last_payment|date:"Y-m-d" }}
+        </div>
+      </div>
+
+      <!-- Action -->
+      <div class="mt-3 mobile-actions">
+        <button class="btn w-100 text-center"
+                onclick="openMemberDetails('{{ r.id }}')">
+          <i class="bi bi-eye me-1"></i> View Details
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  {% empty %}
+  <div class="text-center py-4">
+    No paid members found for this month
+  </div>
+  {% endfor %}
+
+</div>
+  
+  </div>
+</div>
+</div>
+
+<!-- Plan Renewal Modal -->
+<div class="modal fade" id="renewPlanModal" tabindex="-1">
+  <div class="modal-dialog">
+      <div class="modal-content">
+
+          <div class="modal-header bg-primary text-white">
+              <h5 class="modal-title">Renew Membership</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+
+          <form id="renewPlanForm">
+              <div class="modal-body">
+
+                  <!-- hidden -->
+                  <input type="hidden" id="renew_member_id" name="member_id">
+                  <input type="hidden" id="renew_branch_id" name="branch_id">
+
+                  <!-- Member -->
+                  <div class="mb-2">
+                      <label class="form-label">Member Name</label>
+                      <input type="text" id="renew_member_name" class="form-control" readonly>
+                  </div>
+
+                  <!-- Branch -->
+                  <div class="mb-2">
+                      <label class="form-label">Branch</label>
+                      <input type="text" id="renew_branch_name" class="form-control" readonly>
+                  </div>
+
+                  <!-- Current Expiry -->
+                  <div class="mb-2">
+                      <label class="form-label">Current Expiry</label>
+                      <input type="text" id="renew_current_expiry" class="form-control" readonly>
+                  </div>
+                  <div class="mb-2">
+                      <label class="form-label">Plane Start</label>
+                      <input type="date" id="renew_Plane_current_expiry" name="renew_Plane_current_expiry"
+                          class="form-control">
+                  </div>
+                  <hr>
+
+                  <!-- Select Plan -->
+                  <div class="mb-2">
+                      <label class="form-label">Select Plan</label>
+                      <select id="renew_plan" name="plan_id" class="form-select" required>
+                          <option value="">Choose plan</option>
+                      </select>
+                  </div>
+
+                  <!-- Amount -->
+                  <div class="mb-2">
+                      <label class="form-label">Amount</label>
+                      <input type="number" id="renew_amount" name="amount" class="form-control" required readonly>
+                  </div>
+
+                  <!-- Payment Mode -->
+                  <div class="mb-2">
+                      <label class="form-label">Payment Mode</label>
+                      <select name="payment_mode" class="form-select" required>
+                          <option value="cash">Cash</option>
+                          <option value="upi">UPI</option>
+                      </select>
+                  </div>
+
+                  <!-- New validity preview -->
+                  <div class="alert alert-info mb-0">
+                      New Expiry: <b id="renew_new_expiry">-</b>
+                  </div>
+
+              </div>
+
+              <div class="modal-footer">
+                  <button type="submit" class="btn btn-success">Confirm Renewal</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              </div>
+          </form>
+
+      </div>
+  </div>
+</div>
+
+
+<!-- Member Details Modal -->
+<div class="modal fade" id="memberDetailsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+
+          <div class="modal-header">
+              <h5 class="modal-title">Member Details</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+              <!-- Member Summary -->
+              <div class="row g-3 shadow-sm">
+                  <div class="col-md-6 ">
+                      <div class="border rounded p-3">
+                          <div><b>Name:</b> <span id="md_name">-</span></div>
+                          <div><b>Phone:</b> <span id="md_phone">-</span></div>
+                          <div><b>Status:</b> <span id="md_status" class="badge rounded-pill bg-success">-</span></div>
+                          <div><b>Join Date:</b> <span id="md_join_date">-</span></div>
+                      </div>
+                  </div>
+
+                  <div class="col-md-6 ">
+                      <div class="border rounded p-3">
+                          <div><b>Gym:</b> <span id="md_gym">-</span></div>
+                          <div><b>Branch:</b> <span id="md_branch">-</span></div>
+                          <div><b>Plan:</b> <span id="md_plan">-</span></div>
+                          <div><b>Plan Valid:</b> <span id="md_validity">-</span></div>
+                      </div>
+                  </div>
+              </div>
+
+              <hr>
+
+              <!-- Payment Summary -->
+              <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                  <h6 class="mb-0">Payment History</h6>
+                  <div class="text-end">
+                    <span class="me-3"><b>Total Paid:</b> ₹<span id="md_total_paid">0</span></span>
+                    <span class="me-3"><b>Total Discount:</b> ₹<span id="md_total_discount">0</span></span>
+                    <span class="me-3"><b>Total Final:</b> ₹<span id="md_total_final">0</span></span>
+                    <span class="me-3"><b>Pending:</b> ₹<span id="md_total_pending">0</span></span>
+                    <span><b>Last Payment:</b> <span id="md_last_payment">-</span></span>
+                  </div>
+                </div>
+
+              <!-- Payment Table -->
+              <div class="table-responsive">
+                <table class="table table-sm table-bordered align-middle">
+                  <thead>
+                    <tr>
+                      <th style="width:50px;">#</th>
+                      <th>Invoice</th>
+                      <th>Payment Date</th>
+                      <th>Plan</th>
+                      <th>Plan Price</th>
+                      <th>Discount</th>
+                      <th>Final</th>
+                      <th>Paid</th>
+                      <th>Mode</th>
+                      <th>Reason</th>
+                      <th>Given By</th>
+                      <th>Coverage Start</th>
+                      <th>Coverage End</th>
+                    </tr>
+                  </thead>
+                  <tbody id="md_payments_tbody">
+                    <tr>
+                      <td colspan="13" class="text-center">No payments</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+          </div>
+
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+
+      </div>
+  </div>
+</div>
+
+
+
+  <script>
+
+    function safeText(v) {
+      return (v === null || v === undefined || v === "") ? "-" : v;
+  }
+
+
+ 
+// ---------- member details ----------
+function setStatusBadge(label) {
+  const $el = $("#md_status");
+  $el.text(safeText(label));
+
+  // reset classes
+  $el.removeClass("bg-success bg-danger bg-warning text-dark");
+
+  const l = String(label || "").toLowerCase();
+  if (l.includes("active")) $el.addClass("bg-success");
+  else if (l.includes("expired")) $el.addClass("bg-danger");
+  else if (l.includes("expir")) $el.addClass("bg-warning text-dark");
+  else $el.addClass("bg-secondary");
+}
+
+
+function formatMoney(value) {
+  const num = parseFloat(value || 0);
+  return num.toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+function openMemberDetails(memberId) {
+  $.ajax({
+    url: `/members/${memberId}/full-details/`,
+    type: "GET",
+    dataType: "json",
+    success: function (data) {
+      // Member
+      $("#md_name").text(safeText(data.member.name));
+      $("#md_phone").text(safeText(data.member.phone));
+      setStatusBadge(data.member.status_label);
+      $("#md_join_date").text(safeText(data.member.join_date));
+
+      $("#md_gym").text(safeText(data.member.gym_name));
+      $("#md_branch").text(safeText(data.member.branch_name));
+
+      $("#md_plan").text(
+        data.member.plan_name
+          ? `${data.member.plan_name} (₹${safeText(data.member.plan_price)})`
+          : "-"
+      );
+
+      $("#md_validity").text(
+        `${safeText(data.member.start_date)} → ${safeText(data.member.expiry_date)}`
+      );
+
+      // Summary
+      $("#md_total_paid").text(formatMoney(data.summary.total_paid));
+      $("#md_total_discount").text(formatMoney(data.summary.total_discount));
+      $("#md_total_final").text(formatMoney(data.summary.total_final_amount));
+      $("#md_total_pending").text(formatMoney(data.summary.total_pending));
+      $("#md_last_payment").text(safeText(data.summary.last_payment_date));
+
+      // Payments table
+      const $tbody = $("#md_payments_tbody");
+      $tbody.empty();
+
+      if (!data.payments || data.payments.length === 0) {
+        $tbody.html(`<tr><td colspan="13" class="text-center text-muted">No payments</td></tr>`);
+      } else {
+        $.each(data.payments, function (idx, p) {
+          const givenBy = p.created_by_name
+            ? `${p.created_by_name}${p.created_by_role ? ` (${p.created_by_role})` : ""}`
+            : "-";
+
+            $tbody.append(`
+            <tr>
+              <td>${idx + 1}</td>
+              <td>${safeText(p.invoice_no)}</td>
+              <td>${safeText(p.payment_date)}</td>
+              <td>${safeText(p.plan_name)}</td>
+              <td>₹${formatMoney(p.plan_price)}</td>
+              <td class="text-danger fw-semibold">₹${formatMoney(p.discount_amount)}</td>
+              <td class="fw-semibold">₹${formatMoney(p.final_amount)}</td>
+              <td class="text-success fw-semibold">₹${formatMoney(p.amount)}</td>
+              <td>${safeText(p.payment_mode_label)}</td>
+              <td>${safeText(p.discount_reason || "-")}</td>
+              <td>${givenBy}</td>
+              <td>${safeText(p.coverage_start)}</td>
+              <td>${safeText(p.coverage_end)}</td>
+            </tr>
+          `);
+        });
+      }
+
+      // Show modal (Bootstrap 5)
+      const modalEl = document.getElementById("memberDetailsModal");
+      bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    },
+    error: function (xhr, status, err) {
+      console.error("Error loading member details:", err);
+      alert(xhr.responseJSON?.error || "Failed to load member details");
+    }
+  });
+}
+
+
+
+  </script>
+
+{% endblock %}

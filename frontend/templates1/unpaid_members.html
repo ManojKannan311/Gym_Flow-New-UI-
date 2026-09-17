@@ -1,0 +1,909 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+:root{--gf-primary:#2f6fed;--gf-primary-dark:#245bd0;--gf-primary-soft:#edf4ff;--gf-page:#f4f7fb;--gf-border:#e4e9f2;--gf-text:#172033;--gf-muted:#7d8aa5;--gf-warning:#b27b00;--gf-warning-soft:#fff6dc;--gf-danger:#d44949;--gf-danger-soft:#fff0f0;--gf-shadow:0 8px 24px rgba(28,48,86,.07);--gf-radius:18px}
+.unpaid-members-page{background:var(--gf-page);color:var(--gf-text);padding:22px 18px 34px;min-height:calc(100vh - 70px)}
+.unpaid-members-page .page-header,.unpaid-members-page .filter-card,.unpaid-members-page .members-card{background:#fff;border:1px solid var(--gf-border);border-radius:var(--gf-radius);box-shadow:var(--gf-shadow)}
+.unpaid-members-page .page-header{padding:22px 24px;margin-bottom:18px}
+.unpaid-members-page .eyebrow{display:flex;align-items:center;gap:9px;color:var(--gf-primary);font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
+.unpaid-members-page .eyebrow i,.unpaid-members-page .section-icon{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;background:var(--gf-primary-soft);color:var(--gf-primary);border-radius:10px}
+.unpaid-members-page .page-title{margin:0;font-size:24px;font-weight:750;letter-spacing:-.02em}
+.unpaid-members-page .page-subtitle{margin:4px 0 0;color:var(--gf-muted);font-size:14px}
+.unpaid-members-page .total-box{display:flex;align-items:center;gap:12px;padding-left:22px;border-left:1px solid var(--gf-border);min-width:155px}
+.unpaid-members-page .total-icon{width:42px;height:42px;border-radius:12px;background:var(--gf-warning-soft);color:var(--gf-warning);display:flex;align-items:center;justify-content:center;font-size:18px}
+.unpaid-members-page .total-label{font-size:10px;color:var(--gf-muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.unpaid-members-page .total-value{font-size:21px;font-weight:800;color:var(--gf-warning);line-height:1.2;margin-top:3px}
+.unpaid-members-page .filter-card{padding:20px;margin-bottom:18px}
+.unpaid-members-page .section-heading{display:flex;align-items:center;gap:10px;margin-bottom:17px}
+.unpaid-members-page .section-heading h6{margin:0;font-weight:750;font-size:15px}
+.unpaid-members-page .section-heading p{margin:2px 0 0;color:var(--gf-muted);font-size:12px}
+.unpaid-members-page .form-label{display:block;color:#8793a9;font-size:12px;font-weight:650;margin-bottom:7px}
+.unpaid-members-page .form-control,.unpaid-members-page .form-select{min-height:44px;border:1px solid #dfe5ef;border-radius:11px;color:#27334a;background:#fff;box-shadow:none}
+.unpaid-members-page .form-control:focus,.unpaid-members-page .form-select:focus{border-color:#8db2ff;box-shadow:0 0 0 3px rgba(47,111,237,.10)}
+.unpaid-members-page .form-control::placeholder{color:#aeb8ca}
+.unpaid-members-page .btn-primary{background:var(--gf-primary);border-color:var(--gf-primary);border-radius:11px;font-weight:650;padding:10px 16px}
+.unpaid-members-page .btn-primary:hover{background:var(--gf-primary-dark);border-color:var(--gf-primary-dark)}
+.unpaid-members-page .reset-btn{border-radius:11px;padding:10px 16px;font-weight:600;border-color:#dce4ef}
+.unpaid-members-page .members-card{overflow:hidden}
+.unpaid-members-page .members-card-header{padding:18px 20px;border-bottom:1px solid var(--gf-border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.unpaid-members-page .members-card-header h6{margin:0;font-weight:750;font-size:15px}
+.unpaid-members-page .directory-note{display:block;color:var(--gf-muted);font-size:12px;margin-top:3px}
+.unpaid-members-page .attention-chip{padding:7px 10px;border-radius:999px;background:var(--gf-warning-soft);color:var(--gf-warning);font-size:11px;font-weight:750;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.unpaid-members-page .attention-chip:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.unpaid-members-page .table-wrap{overflow-x:auto}
+.unpaid-members-page table{margin:0!important}
+.unpaid-members-page thead th{background:#f8faff;color:#8793a9!important;border-bottom:1px solid var(--gf-border);font-size:11px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;padding:14px 16px!important}
+.unpaid-members-page tbody td{border-color:#edf1f6;color:#344057;font-size:13px;padding:14px 16px!important;vertical-align:middle}
+.unpaid-members-page tbody tr:hover{background:#fbfcff}
+.unpaid-members-page .member-name{color:#1d2940;font-weight:700;line-height:1.2}
+.unpaid-members-page .member-id{display:block;color:var(--gf-muted);font-size:11px;margin-top:3px}
+.unpaid-members-page .member-avatar{width:42px;height:42px;flex:0 0 42px;border-radius:12px!important;border:0!important;background:var(--gf-primary-soft)!important;color:var(--gf-primary);font-weight:750}
+.unpaid-members-page .days-expired{color:var(--gf-danger);font-weight:750}
+.unpaid-members-page .days-left{color:#59677f;font-weight:650}
+.unpaid-members-page .status-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:750;white-space:nowrap}
+.unpaid-members-page .status-pill:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.unpaid-members-page .status-expired{color:var(--gf-danger);background:var(--gf-danger-soft)}
+.unpaid-members-page .status-expiring{color:var(--gf-warning);background:var(--gf-warning-soft)}
+.unpaid-members-page .action-btn{width:35px;height:35px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;background:#fff;border:1px solid #e1e7f0;color:#63708a}
+.unpaid-members-page .action-btn:hover{border-color:#b9cdf5;color:var(--gf-primary);background:var(--gf-primary-soft)}
+.unpaid-members-page .mobile-member-card{background:#fff;border:1px solid var(--gf-border);border-radius:16px;box-shadow:var(--gf-shadow)}
+.unpaid-members-page .mobile-detail{color:#69758d;font-size:12px;line-height:1.9}
+.unpaid-members-page .mobile-detail strong{color:#344057}
+.unpaid-members-page .mobile-actions{display:grid!important;grid-template-columns:repeat(4,1fr);gap:8px}
+.unpaid-members-page .mobile-actions .btn{min-height:48px;border:1px solid #e1e7f0;border-radius:11px!important;color:#59677f;background:#fff;font-weight:650}
+.unpaid-members-page .empty-state{padding:48px!important;text-align:center;color:var(--gf-muted)}
+.modal-content{border:0;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(20,36,70,.18)}
+.modal-header{border-bottom:1px solid #edf1f6;padding:18px 22px}.modal-footer{border-top:1px solid #edf1f6;padding:14px 22px}.modal-body{padding:22px}
+.modal-header.bg-primary{background:var(--gf-primary)!important}
+@media(max-width:767.98px){.unpaid-members-page{padding:14px 10px 26px}.unpaid-members-page .page-header{padding:18px}.unpaid-members-page .page-title{font-size:20px}.unpaid-members-page .total-box{border-left:0;border-top:1px solid var(--gf-border);padding:14px 0 0;margin-top:15px}.unpaid-members-page .filter-card{padding:16px}.unpaid-members-page .mobile-actions{grid-template-columns:repeat(2,1fr)}}
+</style>
+
+
+<link rel="stylesheet" href="{% static 'css/modal_card.css' %}">
+<!-- <style>
+ /* Floating dropdown menu */
+.action-dropdown-menu.floating-menu {
+  position: absolute !important;
+  z-index: 99999 !important;
+  min-width: 180px;
+  background: #fff;
+  border-radius: 0.25rem;
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+}
+
+/* Ensure overflow doesn't hide the dropdown */
+.card, .table-responsive, .card-body {
+  overflow: visible !important;
+}
+
+
+/* Fix dropdown getting cut inside table */
+.table-responsive {
+  overflow-x: auto;
+  overflow-y: visible !important;
+}
+
+/* Allow dropdown to escape card */
+.card {
+  overflow: visible;
+}
+
+/* Ensure dropdown appears above everything */
+.action-dropdown-menu {
+  z-index: 1055;
+  min-width: 150px;
+}
+  </style> -->
+
+
+<div class="unpaid-members-page container-fluid">
+  <div class="page-header">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+      <div>
+        <div class="eyebrow"><i class="bi bi-person-exclamation"></i> Membership Attention</div>
+        <h1 class="page-title">Unpaid Members</h1>
+        <p class="page-subtitle">Members who need to renew soon or whose membership has already expired.</p>
+      </div>
+      <div class="total-box">
+        <div class="total-icon"><i class="bi bi-people-fill"></i></div>
+        <div><div class="total-label">Members Found</div><div class="total-value">{{ members|length }}</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-card">
+    <div class="section-heading">
+      <span class="section-icon"><i class="bi bi-funnel-fill"></i></span>
+      <div><h6>Search &amp; Filter</h6><p>Find members by name, phone, branch or renewal status.</p></div>
+    </div>
+    <form method="get">
+      <div class="row g-3 align-items-end">
+        <div class="col-12 col-lg-4">
+          <label class="form-label">Search Member</label>
+          <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search name or phone">
+        </div>
+        <div class="col-12 col-lg-3">
+          <label class="form-label">Branch</label>
+          <select name="branch" class="form-select">
+            <option value="">All Branches</option>
+            {% for b in branches %}
+              <option value="{{ b.id }}" {% if branch_id == b.id|stringformat:"s" %}selected{% endif %}>{{ b.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-lg-3">
+          <label class="form-label">Membership Status</label>
+          <select name="status" class="form-select">
+            <option value="all" {% if status == "all" %}selected{% endif %}>All</option>
+            <option value="expiring" {% if status == "expiring" %}selected{% endif %}>Expiring Soon</option>
+            <option value="expired" {% if status == "expired" %}selected{% endif %}>Expired</option>
+          </select>
+        </div>
+        <div class="col-12 col-lg-2 d-flex justify-content-end gap-2">
+          <a class="btn btn-outline-secondary reset-btn" href="{% url 'unpaid_members_page' %}">Reset</a>
+          <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i> Filter</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Table Card -->
+  <!-- DESKTOP / TABLET VIEW -->
+<div class="members-card d-none d-md-block">
+  <div class="members-card-header">
+    <div><h6><i class="bi bi-person-lines-fill me-2 text-primary"></i>Renewal Attention</h6><span class="directory-note">Members with expired or soon-to-expire memberships.</span></div>
+    <span class="attention-chip">Action Required</span>
+  </div>
+  <div class="table-wrap">
+    <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Branch</th>
+            <th>Plan</th>
+            <th>Expiry</th>
+            <th>Days Left</th>
+            <th>Status</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for m in members %}
+          <tr>
+            <td>{{ forloop.counter }}</td>            <td>
+              <div class="d-flex align-items-center gap-3">
+                {% if m.photo %}
+                <img src="{{ m.photo.url }}" width="42" height="42" class="member-avatar" style="object-fit:cover;">
+                {% else %}
+                <div class="member-avatar d-flex align-items-center justify-content-center">{{ m.name|slice:":1"|upper }}</div>
+                {% endif %}
+                <div>
+                  <div class="member-name">{{ m.name }}</div>
+                  <span class="member-id">ID: {{ m.admission_number }}</span>
+                </div>
+              </div>
+            </td>
+            <td>{{ m.phone }}</td>
+            <td>{{ m.branch.name }}</td>
+            <td>{{ m.plan.name|default:"-" }}</td>
+            <td>{{ m.expiry_date }}</td>
+
+            <td>
+              {% if m.expiry_date < today %}
+                <span class="days-expired">Expired</span>
+              {% else %}
+                <span class="days-left">{{ m.expiry_date|timeuntil:today }}</span>
+              {% endif %}
+            </td>
+
+            <td>
+              {% if m.expiry_date < today %}
+                <span class="status-pill status-expired">Expired</span>
+              {% else %}
+                <span class="status-pill status-expiring">Expiring Soon</span>
+              {% endif %}
+            </td>
+
+            <td class="text-center">
+              <div class="dropdown">
+                <button class="btn action-btn"
+                        data-bs-toggle="dropdown"
+                        data-bs-boundary="viewport"
+                        title="More actions">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="#" onclick="openMemberDetails('{{ m.id }}')">View</a></li>
+                  <li><a class="dropdown-item" href="tel:+91{{ m.phone }}">Call</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="openRenewModal('{{ m.id }}')">Renew</a></li>
+                </ul>
+              </div>
+            </td>
+
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="empty-state">No members found 🎉</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+  </div>
+</div>
+<!-- MOBILE VIEW -->
+<div class="d-block d-md-none">
+
+  {% for m in members %}
+  <div class="mobile-member-card mb-3">
+    <div class="card-body p-3">
+
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-start">
+
+        <div class="d-flex align-items-center gap-2">
+          {% if m.photo %}
+          <img src="{{ m.photo.url }}" width="50" height="50"
+               class="member-avatar" style="object-fit:cover;">
+          {% else %}
+          <div class="member-avatar d-flex align-items-center justify-content-center"
+               style="width:50px;height:50px;">
+            {{ m.name|slice:":1"|upper }}
+          </div>
+          {% endif %}
+
+          <div>
+            <div class="fw-semibold" style="font-size:15px;">
+              {{ m.name }}
+            </div>
+            <small class="text-muted">ID: {{ m.admission_number }}</small>
+          </div>
+        </div>
+
+        <!-- Status Badge -->
+        <div>
+          {% if m.expiry_date < today %}
+            <span class="status-pill status-expired">Expired</span>
+          {% else %}
+            <span class="status-pill status-expiring">Expiring Soon</span>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <!-- Divider -->
+      <hr class="my-2">
+
+      <!-- Details -->
+      <div class="mobile-detail">
+        <div><strong class="text-dark">📞</strong> {{ m.phone }}</div>
+        <div><strong class="text-dark">🏢</strong> {{ m.branch.name }}</div>
+        <div><strong class="text-dark">📦</strong> {{ m.plan.name|default:"-" }}</div>
+        <div><strong class="text-dark">📅</strong> {{ m.expiry_date }}</div>
+      </div>
+
+      <!-- Actions -->
+      <div class="mt-3 mobile-actions">
+
+        <button class="btn btn-light flex-fill text-center"
+                onclick="openMemberDetails('{{ m.id }}')"
+                style="border-radius:10px;">
+          <i class="bi bi-eye fs-5"></i>
+          <div style="font-size:11px;">View</div>
+        </button>
+
+        <a class="btn btn-light flex-fill text-center"
+           href="tel:+91{{ m.phone }}"
+           style="border-radius:10px;">
+          <i class="bi bi-telephone fs-5 text-primary"></i>
+          <div style="font-size:11px;">Call</div>
+        </a>
+
+        <a class="btn btn-light flex-fill text-center"
+           target="_blank"
+           href="https://wa.me/91{{ m.phone }}?text=Hello%20{{ m.name }}%20👋%0A%0AThis%20is%20a%20friendly%20reminder%20from%20{{ request.user.gym.name|default:'our gym'|urlencode }}%20that%20your%20membership%20is%20either%20expired%20or%20expiring%20soon.%0AExpiry%20Date:%20{{ m.expiry_date|urlencode }}%0APlease%20renew%20it%20at%20your%20earliest%20to%20continue%20uninterrupted%20access.%20💪%0A%0AThank%20you!"
+           style="border-radius:10px;">
+          <i class="bi bi-whatsapp fs-5 text-success"></i>
+          <div style="font-size:11px;">WhatsApp</div>
+        </a>
+
+        <button class="btn btn-light flex-fill text-center"
+                onclick="openRenewModal('{{ m.id }}')"
+                style="border-radius:10px;">
+          <i class="bi bi-arrow-repeat fs-5 text-warning"></i>
+          <div style="font-size:11px;">Renew</div>
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+  {% empty %}
+  <div class="text-center py-4">No members found 🎉</div>
+  {% endfor %}
+
+</div>
+
+</div>
+
+<!-- Member Details Modal -->
+<div class="modal fade" id="memberDetailsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+
+          <div class="modal-header">
+              <h5 class="modal-title">Member Details</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+              <!-- Member Summary -->
+              <div class="row g-3 shadow-sm">
+                  <div class="col-md-6 ">
+                      <div class="border rounded p-3">
+                          <div><b>Name:</b> <span id="md_name">-</span></div>
+                          <div><b>Phone:</b> <span id="md_phone">-</span></div>
+                          <div><b>Status:</b> <span id="md_status" class="badge rounded-pill bg-success">-</span></div>
+                          <div><b>Join Date:</b> <span id="md_join_date">-</span></div>
+                      </div>
+                  </div>
+
+                  <div class="col-md-6 ">
+                      <div class="border rounded p-3">
+                          <div><b>Gym:</b> <span id="md_gym">-</span></div>
+                          <div><b>Branch:</b> <span id="md_branch">-</span></div>
+                          <div><b>Plan:</b> <span id="md_plan">-</span></div>
+                          <div><b>Plan Valid:</b> <span id="md_validity">-</span></div>
+                      </div>
+                  </div>
+              </div>
+
+              <hr>
+
+              <!-- Payment Summary -->
+              <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                  <h6 class="mb-0">Payment History</h6>
+                  <div class="text-end">
+                    <span class="me-3"><b>Total Paid:</b> ₹<span id="md_total_paid">0</span></span>
+                    <span class="me-3"><b>Total Discount:</b> ₹<span id="md_total_discount">0</span></span>
+                    <span class="me-3"><b>Total Final:</b> ₹<span id="md_total_final">0</span></span>
+                    <span class="me-3"><b>Pending:</b> ₹<span id="md_total_pending">0</span></span>
+                    <span><b>Last Payment:</b> <span id="md_last_payment">-</span></span>
+                  </div>
+                </div>
+
+              <!-- Payment Table -->
+              <div class="table-responsive">
+                <table class="table table-sm table-bordered align-middle">
+                  <thead>
+                    <tr>
+                      <th style="width:50px;">#</th>
+                      <th>Invoice</th>
+                      <th>Payment Date</th>
+                      <th>Plan</th>
+                      <th>Plan Price</th>
+                      <th>Discount</th>
+                      <th>Final</th>
+                      <th>Paid</th>
+                      <th>Mode</th>
+                      <th>Reason</th>
+                      <th>Given By</th>
+                      <th>Coverage Start</th>
+                      <th>Coverage End</th>
+                    </tr>
+                  </thead>
+                  <tbody id="md_payments_tbody">
+                    <tr>
+                      <td colspan="13" class="text-center">No payments</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+          </div>
+
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+
+      </div>
+  </div>
+</div>
+
+
+
+
+
+<!-- Plan Renewal Modal -->
+<div class="modal fade" id="renewPlanModal" tabindex="-1">
+  <div class="modal-dialog">
+      <div class="modal-content">
+
+          <div class="modal-header bg-primary text-white">
+              <h5 class="modal-title">Renew Membership</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+
+          <form id="renewPlanForm">
+              <div class="modal-body">
+
+                  <!-- hidden -->
+                  <input type="hidden" id="renew_member_id" name="member_id">
+                  <input type="hidden" id="renew_branch_id" name="branch_id">
+
+                  <!-- Member -->
+                  <div class="mb-2">
+                      <label class="form-label">Member Name</label>
+                      <input type="text" id="renew_member_name" class="form-control" readonly>
+                  </div>
+
+                  <!-- Branch -->
+                  <div class="mb-2">
+                      <label class="form-label">Branch</label>
+                      <input type="text" id="renew_branch_name" class="form-control" readonly>
+                  </div>
+
+                  <!-- Current Expiry -->
+                  <div class="mb-2">
+                      <label class="form-label">Current Expiry</label>
+                      <input type="text" id="renew_current_expiry" class="form-control" readonly>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label">Plane Start</label>
+                    <input type="date" id="renew_Plane_current_expiry"  name="renew_Plane_current_expiry" class="form-control">
+                </div>
+
+                  <hr>
+
+                  <!-- Select Plan -->
+                  <div class="mb-2">
+                      <label class="form-label">Select Plan</label>
+                      <select id="renew_plan" name="plan_id" class="form-select" required>
+                          <option value="">Choose plan</option>
+                      </select>
+                  </div>
+
+                  <!-- Amount -->
+                  <div class="mb-2">
+                      <label class="form-label">Amount</label>
+                      <input type="number" id="renew_amount" name="amount" class="form-control" required readonly >
+                  </div>
+                   <!-- ✅ Discount -->
+                   <div class="mb-2">
+                    <label class="form-label small fw-semibold text-muted">
+                        Discount Amount (₹)
+                    </label>
+                    <input type="number" name="discount_amount" class="form-control" id="discount_amount"
+                        min="0" step="0.01" placeholder="0.00">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small fw-semibold text-muted">
+                        Discount Reason
+                    </label>
+                    <input type="text" name="discount_reason" class="form-control" id="discount_reason"
+                        placeholder="Festival offer / Student / etc">
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label small fw-semibold text-muted">
+                        Referral Name
+                    </label>
+                    <input type="text" name="referral_name" class="form-control" id="referral_name"
+                        placeholder="Who referred this member?">
+                </div>
+
+
+
+                  <div class="mb-2">
+                    <label class="form-label small fw-semibold text-muted">
+                      Paid Now (₹) <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" name="paid_amount" class="form-control"
+                           min="0" step="0.01" placeholder="Enter paid amount" >
+                  </div>
+
+                  <!-- Payment Mode -->
+                  <div class="mb-2">
+                      <label class="form-label">Payment Mode</label>
+                      <select name="payment_mode" class="form-select" required>
+                          <option value="cash">Cash</option>
+                          <option value="upi">UPI</option>
+                      </select>
+                  </div>
+
+                  <!-- New validity preview -->
+                  <div class="alert alert-info mb-0">
+                      New Expiry: <b id="renew_new_expiry">-</b>
+                  </div>
+
+              </div>
+
+              <div class="modal-footer">
+                  <button type="submit" class="btn btn-success">Confirm Renewal</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              </div>
+          </form>
+
+      </div>
+  </div>
+</div>
+
+
+<!-- WhatsApp Receipt Modal -->
+<div class="modal fade" id="sendReceiptModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Receipt Ready ✅</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body text-center">
+        <p class="mb-3">
+          Receipt is ready ✅<br>
+          Click below to view the PDF or send it via WhatsApp.
+        </p>
+
+        <a id="sr_pdf_btn" href="#" target="_blank" class="btn btn-primary">
+          <i class="bi bi-filetype-pdf me-1"></i> View PDF
+        </a>
+      </div>
+
+      <div class="modal-footer justify-content-between">
+        <a id="sr_whatsapp_btn" href="#" class="btn btn-success" target="_blank">
+          <i class="bi bi-whatsapp me-1"></i> Send via WhatsApp
+        </a>
+
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          Later
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  
+  //css
+    document.addEventListener("DOMContentLoaded", function () {
+      let activeMenu = null;
+    
+      document.querySelectorAll(".action-dropdown").forEach(function (dropdown) {
+        const button = dropdown.querySelector('[data-bs-toggle="dropdown"]');
+        const menu = dropdown.querySelector(".action-dropdown-menu");
+    
+        if (!button || !menu) return;
+    
+        dropdown.addEventListener("show.bs.dropdown", function () {
+          activeMenu = menu;
+    
+          // Move menu to body
+          document.body.appendChild(menu);
+          menu.classList.add("floating-menu", "show");
+    
+          const rect = button.getBoundingClientRect();
+          const menuWidth = menu.offsetWidth;
+          const menuHeight = menu.offsetHeight;
+    
+          let top = rect.bottom + window.scrollY + 4;
+          let left = rect.right - menuWidth;
+    
+          // Prevent offscreen
+          if (left < 4) left = 4;
+          if (top + menuHeight > window.innerHeight + window.scrollY) {
+            top = rect.top + window.scrollY - menuHeight;
+          }
+    
+          menu.style.top = `${top}px`;
+          menu.style.left = `${left}px`;
+        });
+    
+        dropdown.addEventListener("hide.bs.dropdown", function () {
+          if (!activeMenu) return;
+    
+          activeMenu.classList.remove("show", "floating-menu");
+          activeMenu.style.top = "";
+          activeMenu.style.left = "";
+    
+          // Move back to dropdown container
+          dropdown.appendChild(activeMenu);
+          activeMenu = null;
+        });
+      });
+    
+      // Hide dropdown on scroll/resize
+      window.addEventListener("scroll", () => { if (activeMenu) activeMenu.classList.remove("show"); }, true);
+      window.addEventListener("resize", () => { if (activeMenu) activeMenu.classList.remove("show"); });
+    });
+
+
+
+  //css
+
+  function safeText(v) {
+    return (v === null || v === undefined || v === "") ? "-" : v;
+}
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+$.ajaxSetup({
+    headers: { "X-CSRFToken": getCookie("csrftoken") }
+});
+
+
+// YYYY-MM-DD -> Date (local)
+function parseISODate(s) {
+    if (!s) return null;
+    const d = new Date(s + "T00:00:00");
+    return isNaN(d.getTime()) ? null : d;
+}
+
+function toISODate(d) {
+    return d.toISOString().split("T")[0];
+}
+
+// ---------- Renewal Modal Open ----------
+function openRenewModal(memberId) {
+    // reset form
+    $("#renewPlanForm")[0].reset();
+    $("#renew_plan").html('<option value="">Choose plan</option>');
+    $("#renew_new_expiry").text("-");
+
+    $.get(`/members/${memberId}/full-details/`)
+        .done(function (data) {
+            $("#renew_member_id").val(data.member.id);
+            $("#renew_member_name").val(safeText(data.member.name));
+            $("#renew_branch_id").val(data.member.branch_id);
+            $("#renew_branch_name").val(safeText(data.member.branch_name));
+            $("#renew_current_expiry").val(safeText(data.member.expiry_date));
+
+            // load plans for this branch
+            loadPlans(data.member.branch_id);
+
+            // show modal
+            const modalEl = document.getElementById("renewPlanModal");
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+        })
+        .fail(function (xhr) {
+            console.error("Failed to load member details", xhr.responseText);
+            alert("Failed to load member details");
+        });
+}
+
+// ---------- Load Plans ----------
+function loadPlans(branchId) {
+    $("#renew_plan").html('<option value="">Loading...</option>');
+
+    $.get(`/branches/${branchId}/plans/`)
+        .done(function (plans) {
+            let options = '<option value="">Choose plan</option>';
+
+            $.each(plans, function (i, p) {
+                options += `
+        <option value="${p.id}"
+                data-price="${p.price}"
+                data-duration="${p.duration_days}">
+          ${p.name} (₹${p.price})
+        </option>`;
+            });
+
+            $("#renew_plan").html(options);
+        })
+        .fail(function (xhr) {
+            console.error("Failed to load plans", xhr.responseText);
+            $("#renew_plan").html('<option value="">No plans found</option>');
+        });
+}
+
+// ---------- Plan Change: Auto amount + Correct expiry preview ----------
+$(document).on("change", "#renew_plan", function () {
+    const $opt = $(this).find(":selected");
+    const price = $opt.data("price");
+    const duration = parseInt($opt.data("duration") || 0, 10);
+
+    $("#renew_amount").val(price || "");
+
+    if (!duration) {
+        $("#renew_new_expiry").text("-");
+        return;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const currentExpiryStr = $("#renew_current_expiry").val();
+    const expiryDate = parseISODate(currentExpiryStr);
+
+    // ✅ Renewal start:
+    // if not expired -> start after current expiry
+    // if expired -> start today
+    let startDate = new Date(today);
+    if (expiryDate && expiryDate >= today) {
+        startDate = new Date(expiryDate);
+        startDate.setDate(startDate.getDate() + 1);
+    }
+
+    // ✅ End date = start + (duration - 1)
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + (duration - 1));
+
+    $("#renew_new_expiry").text(toISODate(endDate));
+});
+
+// ---------- Submit Renewal ----------
+$(document).on("submit", "#renewPlanForm", function (e) {
+    e.preventDefault();
+
+    const memberId = $("#renew_member_id").val();
+    const url = `/members/${memberId}/renew/`;
+
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: $(this).serialize(),
+        dataType: "json",
+        success: function (res) {
+          if (res.success) {
+            // Set WhatsApp link
+            $("#sr_whatsapp_btn").attr("href", res.whatsapp_url);
+            console.log(res.invoice_no)
+            $("#sr_pdf_btn").attr("href", `/payments/${res.invoice_no}/invoice-pdf/`);
+
+            
+            // Close renew modal (optional)
+            const renewModalEl = document.getElementById("renewPlanModal");
+            if (renewModalEl) {
+              const renewModal = bootstrap.Modal.getInstance(renewModalEl);
+              if (renewModal) renewModal.hide();
+            }
+            // Show receipt modal
+            const modal = new bootstrap.Modal(document.getElementById("sendReceiptModal"));
+            modal.show();
+            setTimeout(function(){
+              location.reload()
+            },2000)
+          } else {
+            alert(res.message || "Renewal failed");
+          }}
+          ,
+        error: function (xhr) {
+            console.error("Renewal error:", xhr.responseText);
+            alert("Renewal failed (check console)");
+        }
+    });
+});
+
+$("#sr_whatsapp_btn").click(function(){
+  setTimeout(function () {
+    location.reload();
+  }, 3000);
+})
+
+
+
+
+
+// ---------- member details ----------
+function setStatusBadge(label) {
+  const $el = $("#md_status");
+  $el.text(safeText(label));
+
+  // reset classes
+  $el.removeClass("bg-success bg-danger bg-warning text-dark");
+
+  const l = String(label || "").toLowerCase();
+  if (l.includes("active")) $el.addClass("bg-success");
+  else if (l.includes("expired")) $el.addClass("bg-danger");
+  else if (l.includes("expir")) $el.addClass("bg-warning text-dark");
+  else $el.addClass("bg-secondary");
+}
+
+function formatMoney(value) {
+  const num = parseFloat(value || 0);
+  return num.toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+function openMemberDetails(memberId) {
+  $.ajax({
+    url: `/members/${memberId}/full-details/`,
+    type: "GET",
+    dataType: "json",
+    success: function (data) {
+      // Member
+      $("#md_name").text(safeText(data.member.name));
+      $("#md_phone").text(safeText(data.member.phone));
+      setStatusBadge(data.member.status_label);
+      $("#md_join_date").text(safeText(data.member.join_date));
+
+      $("#md_gym").text(safeText(data.member.gym_name));
+      $("#md_branch").text(safeText(data.member.branch_name));
+
+      $("#md_plan").text(
+        data.member.plan_name
+          ? `${data.member.plan_name} (₹${safeText(data.member.plan_price)})`
+          : "-"
+      );
+
+      $("#md_validity").text(
+        `${safeText(data.member.start_date)} → ${safeText(data.member.expiry_date)}`
+      );
+
+      // Summary
+      $("#md_total_paid").text(formatMoney(data.summary.total_paid));
+      $("#md_total_discount").text(formatMoney(data.summary.total_discount));
+      $("#md_total_final").text(formatMoney(data.summary.total_final_amount));
+      $("#md_total_pending").text(formatMoney(data.summary.total_pending));
+      $("#md_last_payment").text(safeText(data.summary.last_payment_date));
+
+      // Payments table
+      const $tbody = $("#md_payments_tbody");
+      $tbody.empty();
+
+      if (!data.payments || data.payments.length === 0) {
+        $tbody.html(`<tr><td colspan="13" class="text-center text-muted">No payments</td></tr>`);
+      } else {
+        $.each(data.payments, function (idx, p) {
+          const givenBy = p.created_by_name
+            ? `${p.created_by_name}${p.created_by_role ? ` (${p.created_by_role})` : ""}`
+            : "-";
+
+            $tbody.append(`
+            <tr>
+              <td>${idx + 1}</td>
+              <td>${safeText(p.invoice_no)}</td>
+              <td>${safeText(p.payment_date)}</td>
+              <td>${safeText(p.plan_name)}</td>
+              <td>₹${formatMoney(p.plan_price)}</td>
+              <td class="text-danger fw-semibold">₹${formatMoney(p.discount_amount)}</td>
+              <td class="fw-semibold">₹${formatMoney(p.final_amount)}</td>
+              <td class="text-success fw-semibold">₹${formatMoney(p.amount)}</td>
+              <td>${safeText(p.payment_mode_label)}</td>
+              <td>${safeText(p.discount_reason || "-")}</td>
+              <td>${givenBy}</td>
+              <td>${safeText(p.coverage_start)}</td>
+              <td>${safeText(p.coverage_end)}</td>
+            </tr>
+          `);
+        });
+      }
+
+      // Show modal (Bootstrap 5)
+      const modalEl = document.getElementById("memberDetailsModal");
+      bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    },
+    error: function (xhr, status, err) {
+      console.error("Error loading member details:", err);
+      alert(xhr.responseJSON?.error || "Failed to load member details");
+    }
+  });
+}
+
+
+
+</script>
+
+
+{% endblock %}

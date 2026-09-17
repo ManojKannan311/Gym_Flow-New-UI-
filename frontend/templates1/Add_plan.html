@@ -1,0 +1,468 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+:root{
+    --gf-primary:#2f6fed;
+    --gf-primary-dark:#245bd0;
+    --gf-primary-soft:#edf4ff;
+    --gf-page:#f4f7fb;
+    --gf-border:#e4e9f2;
+    --gf-text:#172033;
+    --gf-muted:#7d8aa5;
+    --gf-success:#16845b;
+    --gf-shadow:0 8px 24px rgba(28,48,86,.07);
+    --gf-radius:18px;
+}
+
+.launch-plan-page{
+    min-height:calc(100vh - 70px);
+    background:var(--gf-page);
+    padding:22px 18px 36px;
+    color:var(--gf-text);
+}
+
+/* Alerts */
+.launch-plan-page .alert{
+    border:1px solid transparent;
+    border-radius:12px;
+    padding:12px 16px;
+    margin-bottom:16px;
+}
+
+/* Header */
+.launch-plan-page .page-header{
+    background:#fff;
+    border:1px solid var(--gf-border);
+    border-radius:var(--gf-radius);
+    box-shadow:var(--gf-shadow);
+    padding:22px 24px;
+    margin-bottom:18px;
+}
+
+.launch-plan-page .eyebrow{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    color:var(--gf-primary);
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+    margin-bottom:7px;
+}
+
+.launch-plan-page .eyebrow-icon{
+    width:34px;
+    height:34px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--gf-primary-soft);
+    color:var(--gf-primary);
+    border-radius:10px;
+}
+
+.launch-plan-page .page-title{
+    margin:0;
+    font-size:24px;
+    font-weight:750;
+    letter-spacing:-.02em;
+}
+
+.launch-plan-page .page-subtitle{
+    margin:4px 0 0;
+    color:var(--gf-muted);
+    font-size:14px;
+}
+
+.launch-plan-page .view-plans-btn{
+    border-radius:11px;
+    padding:10px 16px;
+    font-weight:650;
+}
+
+/* Form card */
+.launch-plan-page .form-card{
+    background:#fff;
+    border:1px solid var(--gf-border);
+    border-radius:var(--gf-radius);
+    box-shadow:var(--gf-shadow);
+    overflow:hidden;
+}
+
+.launch-plan-page .form-card-header{
+    padding:20px 24px;
+    border-bottom:1px solid var(--gf-border);
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.launch-plan-page .section-icon{
+    width:38px;
+    height:38px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--gf-primary-soft);
+    color:var(--gf-primary);
+    border-radius:11px;
+    flex:0 0 38px;
+}
+
+.launch-plan-page .section-title{
+    margin:0;
+    font-size:16px;
+    font-weight:750;
+}
+
+.launch-plan-page .section-subtitle{
+    margin:3px 0 0;
+    color:var(--gf-muted);
+    font-size:12px;
+}
+
+.launch-plan-page .form-card-body{
+    padding:24px;
+}
+
+/* Form sections */
+.launch-plan-page .form-section{
+    padding:18px;
+    background:#f8faff;
+    border:1px solid #edf1f6;
+    border-radius:14px;
+    margin-bottom:18px;
+}
+
+.launch-plan-page .form-section:last-of-type{
+    margin-bottom:22px;
+}
+
+.launch-plan-page .form-section-heading{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    color:var(--gf-primary);
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    margin-bottom:16px;
+}
+
+.launch-plan-page .form-section-heading i{
+    font-size:14px;
+}
+
+.launch-plan-page .form-label{
+    display:block;
+    color:#8793a9;
+    font-size:12px;
+    font-weight:650;
+    margin-bottom:7px;
+}
+
+.launch-plan-page .form-control,
+.launch-plan-page .form-select{
+    min-height:46px;
+    border:1px solid #dfe5ef;
+    border-radius:11px;
+    color:#27334a;
+    background:#fff;
+    box-shadow:none;
+}
+
+.launch-plan-page .form-control:focus,
+.launch-plan-page .form-select:focus{
+    border-color:#8db2ff;
+    box-shadow:0 0 0 3px rgba(47,111,237,.10);
+}
+
+.launch-plan-page .form-control::placeholder{
+    color:#aeb8ca;
+}
+
+.launch-plan-page .required{
+    color:#d44949;
+}
+
+/* Input icons */
+.launch-plan-page .input-wrap{
+    position:relative;
+}
+
+.launch-plan-page .input-wrap .input-icon{
+    position:absolute;
+    left:14px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#9aa6ba;
+    pointer-events:none;
+}
+
+.launch-plan-page .input-wrap .form-control,
+.launch-plan-page .input-wrap .form-select{
+    padding-left:40px;
+}
+
+/* Actions */
+.launch-plan-page .actions{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:9px;
+    padding-top:2px;
+}
+
+.launch-plan-page .actions .btn{
+    min-height:44px;
+    border-radius:11px;
+    padding:10px 18px;
+    font-weight:650;
+}
+
+.launch-plan-page .activate-btn{
+    background:var(--gf-primary);
+    border-color:var(--gf-primary);
+}
+
+.launch-plan-page .activate-btn:hover{
+    background:var(--gf-primary-dark);
+    border-color:var(--gf-primary-dark);
+}
+
+/* Helpful note */
+.launch-plan-page .form-note{
+    display:flex;
+    align-items:flex-start;
+    gap:9px;
+    color:var(--gf-muted);
+    font-size:12px;
+    margin-top:4px;
+}
+
+.launch-plan-page .form-note i{
+    color:var(--gf-primary);
+    margin-top:1px;
+}
+
+/* Responsive */
+@media(max-width:767.98px){
+    .launch-plan-page{
+        padding:14px 10px 26px;
+    }
+
+    .launch-plan-page .page-header{
+        padding:18px;
+    }
+
+    .launch-plan-page .page-title{
+        font-size:20px;
+    }
+
+    .launch-plan-page .view-plans-btn{
+        width:100%;
+        margin-top:16px;
+    }
+
+    .launch-plan-page .form-card-header{
+        padding:17px 18px;
+    }
+
+    .launch-plan-page .form-card-body{
+        padding:16px;
+    }
+
+    .launch-plan-page .form-section{
+        padding:15px;
+    }
+
+    .launch-plan-page .actions{
+        flex-direction:column-reverse;
+    }
+
+    .launch-plan-page .actions .btn{
+        width:100%;
+    }
+}
+</style>
+
+<div class="launch-plan-page container-fluid">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm"
+                 role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+            <div>
+                <div class="eyebrow">
+                    <span class="eyebrow-icon"><i class="bi bi-award-fill"></i></span>
+                    Membership Configuration
+                </div>
+                <h1 class="page-title">Launch Plan</h1>
+                <p class="page-subtitle">
+                    Set up and manage a new gym subscription plan for your branches.
+                </p>
+            </div>
+
+            <a href="{% url 'plans' %}" class="btn btn-outline-primary view-plans-btn">
+                <i class="bi bi-grid-3x3-gap me-1"></i>
+                View Plans
+            </a>
+        </div>
+    </div>
+
+    <!-- Plan Form -->
+    <div class="form-card">
+
+        <div class="form-card-header">
+            <span class="section-icon">
+                <i class="bi bi-plus-circle-fill"></i>
+            </span>
+            <div>
+                <h6 class="section-title">Create Subscription Plan</h6>
+                <p class="section-subtitle">
+                    Configure the branch, plan duration and pricing details.
+                </p>
+            </div>
+        </div>
+
+        <div class="form-card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Branch & Plan -->
+                <div class="form-section">
+                    <div class="form-section-heading">
+                        <i class="bi bi-building"></i>
+                        Branch &amp; Plan Information
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Branch <span class="required">*</span>
+                            </label>
+
+                            <div class="input-wrap">
+                                <i class="bi bi-building input-icon"></i>
+                                <select class="form-select" name="branch" id="branch_id" required>
+                                    <option value="">Select Branch</option>
+                                    {% for branch in add_new %}
+                                        <option value="{{ branch.id }}">{{ branch.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Plan Name <span class="required">*</span>
+                            </label>
+
+                            <div class="input-wrap">
+                                <i class="bi bi-tag input-icon"></i>
+                                <input type="text"
+                                       name="Plan_name"
+                                       class="form-control"
+                                       placeholder="e.g. Premium Monthly"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Duration & Pricing -->
+                <div class="form-section">
+                    <div class="form-section-heading">
+                        <i class="bi bi-calendar-check"></i>
+                        Plan Duration &amp; Pricing
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Plan Duration <span class="required">*</span>
+                            </label>
+
+                            <div class="input-wrap">
+                                <i class="bi bi-calendar3 input-icon"></i>
+                                <input type="number"
+                                       name="Plan_duration"
+                                       class="form-control"
+                                       placeholder="Number of days"
+                                       min="1"
+                                       required>
+                            </div>
+
+                            <div class="form-note">
+                                <i class="bi bi-info-circle"></i>
+                                <span>Enter the number of days the membership remains valid.</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Amount (₹) <span class="required">*</span>
+                            </label>
+
+                            <div class="input-wrap">
+                                <i class="bi bi-currency-rupee input-icon"></i>
+                                <input type="number"
+                                       name="Plan_amount"
+                                       class="form-control"
+                                       placeholder="Plan amount"
+                                       id="price"
+                                       min="0"
+                                       step="0.01"
+                                       required>
+                            </div>
+
+                            <div class="form-note">
+                                <i class="bi bi-info-circle"></i>
+                                <span>Set the amount customers will pay for this membership plan.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="actions">
+                    <button type="reset" class="btn btn-light border">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>
+                        Reset
+                    </button>
+
+                    <button type="submit" class="btn btn-primary activate-btn">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Activate Plan
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function () {
+    setTimeout(function () {
+        $(".alert").slideUp("slow", function () {
+            $(this).alert('close');
+        });
+    }, 3000);
+});
+</script>
+
+{% endblock %}

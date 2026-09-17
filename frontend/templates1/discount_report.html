@@ -1,0 +1,712 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  .gf-discount-page {
+    --gf-primary: #2f6fed;
+    --gf-primary-dark: #245bd0;
+    --gf-primary-soft: #edf4ff;
+    --gf-page: #f4f7fb;
+    --gf-border: #e4e9f2;
+    --gf-text: #172033;
+    --gf-muted: #7d8aa5;
+    --gf-danger: #d44949;
+    --gf-danger-soft: #fff0f0;
+    --gf-success: #16845b;
+    --gf-success-soft: #ebf4f2;
+    --gf-shadow: 0 8px 24px rgba(25, 45, 80, .06);
+    color: var(--gf-text);
+  }
+
+  .gf-discount-page .gf-header,
+  .gf-discount-page .gf-card {
+    background: #fff;
+    border: 1px solid var(--gf-border);
+    border-radius: 16px;
+    box-shadow: var(--gf-shadow);
+  }
+
+  .gf-discount-page .gf-header {
+    padding: 22px 24px;
+  }
+
+  .gf-eyebrow {
+    color: var(--gf-primary);
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .gf-title {
+    font-size: 1.45rem;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -.02em;
+  }
+
+  .gf-subtitle {
+    color: var(--gf-muted);
+    font-size: .86rem;
+    margin: 5px 0 0;
+  }
+
+  .gf-page-btn {
+    border-radius: 10px;
+    font-weight: 700;
+    padding: 9px 14px;
+  }
+
+  .gf-stat {
+    position: relative;
+    overflow: hidden;
+    padding: 19px 20px;
+    height: 100%;
+  }
+
+  .gf-stat-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gf-primary-soft);
+    color: var(--gf-primary);
+    font-size: 1.05rem;
+    margin-bottom: 13px;
+  }
+
+  .gf-stat-danger .gf-stat-icon {
+    background: var(--gf-danger-soft);
+    color: var(--gf-danger);
+  }
+
+  .gf-stat-label {
+    color: var(--gf-muted);
+    font-size: .76rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .gf-stat-value {
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -.02em;
+  }
+
+  .gf-section {
+    padding: 18px 20px;
+  }
+
+  .gf-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .gf-section-title {
+    font-size: .98rem;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .gf-section-subtitle {
+    color: var(--gf-muted);
+    font-size: .78rem;
+    margin: 3px 0 0;
+  }
+
+  .gf-filter-label {
+    color: #65718a;
+    font-size: .72rem;
+    font-weight: 800;
+    margin: 0 0 6px 2px;
+  }
+
+  .gf-discount-page .form-control,
+  .gf-discount-page .form-select {
+    min-height: 42px;
+    border-color: var(--gf-border);
+    border-radius: 10px;
+    font-size: .84rem;
+    box-shadow: none;
+  }
+
+  .gf-discount-page .form-control:focus,
+  .gf-discount-page .form-select:focus {
+    border-color: var(--gf-primary);
+    box-shadow: 0 0 0 3px rgba(47,111,237,.10);
+  }
+
+  .gf-filter-actions {
+    min-height: 42px;
+  }
+
+  .gf-table-wrap {
+    overflow-x: auto;
+  }
+
+  .gf-table {
+    min-width: 1120px;
+  }
+
+  .gf-table thead th {
+    background: #f8faff;
+    color: #74809a;
+    border-bottom: 1px solid var(--gf-border);
+    font-size: .69rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 12px 14px;
+  }
+
+  .gf-table tbody td {
+    border-color: #edf0f5;
+    color: #273248;
+    font-size: .82rem;
+    padding: 14px;
+    vertical-align: middle;
+  }
+
+  .gf-table tbody tr:hover {
+    background: #fbfcff;
+  }
+
+  .gf-member {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 170px;
+  }
+
+  .gf-avatar {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    border-radius: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gf-primary-soft);
+    color: var(--gf-primary);
+    font-size: .82rem;
+    font-weight: 800;
+  }
+
+  .gf-member-name {
+    font-weight: 800;
+    color: var(--gf-text);
+    line-height: 1.2;
+  }
+
+  .gf-member-phone {
+    color: var(--gf-muted);
+    font-size: .72rem;
+    margin-top: 3px;
+  }
+
+  .gf-discount-amount {
+    color: var(--gf-danger);
+    background: var(--gf-danger-soft);
+    border-radius: 8px;
+    display: inline-block;
+    padding: 4px 7px;
+  }
+
+  .gf-final-amount {
+    font-weight: 800;
+  }
+
+  .gf-staff-role {
+    color: var(--gf-muted);
+    font-size: .7rem;
+    margin-top: 2px;
+  }
+
+  .gf-referral {
+    color: #41506b;
+  }
+
+  .gf-reason {
+    color: #59657b;
+    max-width: 180px;
+  }
+
+  .gf-date {
+    color: #66738b;
+    white-space: nowrap;
+  }
+
+  .gf-mobile-card {
+    padding: 16px;
+  }
+
+  .gf-mobile-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .gf-mobile-date {
+    color: var(--gf-muted);
+    font-size: .72rem;
+    white-space: nowrap;
+  }
+
+  .gf-mobile-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px;
+    margin: 13px 0;
+    border-radius: 12px;
+    background: #f8faff;
+    border: 1px solid #edf1f7;
+  }
+
+  .gf-mobile-summary-label {
+    color: var(--gf-muted);
+    font-size: .68rem;
+    font-weight: 700;
+  }
+
+  .gf-mobile-summary-value {
+    font-size: .92rem;
+    font-weight: 800;
+  }
+
+  .gf-mobile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 11px 16px;
+  }
+
+  .gf-mobile-item {
+    min-width: 0;
+  }
+
+  .gf-mobile-label {
+    color: var(--gf-muted);
+    display: block;
+    font-size: .68rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+
+  .gf-mobile-value {
+    color: #29344a;
+    font-size: .78rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .gf-empty {
+    padding: 52px 20px;
+    text-align: center;
+    color: var(--gf-muted);
+  }
+
+  .gf-empty-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 12px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f4fa;
+    color: #91a0b9;
+    font-size: 1.15rem;
+  }
+
+  @media (max-width: 767.98px) {
+    .gf-discount-page .container-fluid {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+
+    .gf-header {
+      padding: 18px !important;
+    }
+
+    .gf-title {
+      font-size: 1.22rem;
+    }
+
+    .gf-header .gf-page-btn {
+      padding: 8px 10px;
+    }
+
+    .gf-header .gf-page-btn span {
+      display: none;
+    }
+
+    .gf-stat {
+      padding: 16px;
+    }
+
+    .gf-stat-icon {
+      width: 38px;
+      height: 38px;
+      margin-bottom: 10px;
+    }
+
+    .gf-stat-value {
+      font-size: 1.15rem;
+    }
+
+    .gf-section {
+      padding: 16px;
+    }
+
+    .gf-section-head {
+      align-items: flex-start;
+    }
+
+    .gf-mobile-card {
+      border-radius: 15px;
+    }
+  }
+</style>
+
+<div class="container-fluid gf-discount-page py-2 py-md-3">
+
+  <!-- Header -->
+  <div class="gf-header mb-3">
+    <div class="d-flex justify-content-between align-items-center gap-3">
+      <div>
+        <div class="gf-eyebrow">
+          <i class="bi bi-bar-chart-line me-1"></i> Finance Insights
+        </div>
+        <h1 class="gf-title">Discount Report</h1>
+        <p class="gf-subtitle">Track discounts, referrals, and who applied them.</p>
+      </div>
+
+      <a href="{% url 'dashboard' %}" class="btn btn-outline-primary btn-sm gf-page-btn">
+        <i class="bi bi-arrow-left me-md-1"></i>
+        <span>Back to Dashboard</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-md-4">
+      <div class="gf-card gf-stat gf-stat-danger">
+        <div class="gf-stat-icon">
+          <i class="bi bi-tag-fill"></i>
+        </div>
+        <div class="gf-stat-label">Total Discount</div>
+        <div class="gf-stat-value text-danger">₹ {{ summary.total_discount }}</div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-4">
+      <div class="gf-card gf-stat">
+        <div class="gf-stat-icon">
+          <i class="bi bi-cash-stack"></i>
+        </div>
+        <div class="gf-stat-label">Total Collected (After Discount)</div>
+        <div class="gf-stat-value">₹ {{ summary.total_collected }}</div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-4">
+      <div class="gf-card gf-stat">
+        <div class="gf-stat-icon">
+          <i class="bi bi-receipt"></i>
+        </div>
+        <div class="gf-stat-label">Discount Entries</div>
+        <div class="gf-stat-value">{{ summary.total_rows }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="gf-card mb-3">
+    <div class="gf-section">
+      <div class="gf-section-head">
+        <div>
+          <h2 class="gf-section-title">
+            <i class="bi bi-funnel me-1 text-primary"></i> Search & Filter
+          </h2>
+          <p class="gf-section-subtitle">Filter discount activity by member, branch, staff, or date range.</p>
+        </div>
+      </div>
+
+      <form method="get">
+        <div class="row g-2 g-md-3">
+          <div class="col-12 col-md-3">
+            <label class="gf-filter-label">Search Member</label>
+            <input type="text" name="q" value="{{ filters.q }}" class="form-control"
+                   placeholder="Search name or phone">
+          </div>
+
+          <div class="col-12 col-md-2">
+            <label class="gf-filter-label">Branch</label>
+            <select name="branch" class="form-select">
+              <option value="">All Branches</option>
+              {% for b in branches %}
+                <option value="{{ b.id }}" {% if filters.branch == b.id|stringformat:"s" %}selected{% endif %}>
+                  {{ b.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-12 col-md-2">
+            <label class="gf-filter-label">Staff</label>
+            <select name="created_by" class="form-select">
+              <option value="">All Staff</option>
+              {% for u in staff %}
+                <option value="{{ u.id }}" {% if filters.created_by == u.id|stringformat:"s" %}selected{% endif %}>
+                  {{ u.first_name|default:u.username }} ({{ u.role }})
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-6 col-md-2">
+            <label class="gf-filter-label">Start Date</label>
+            <input type="date" name="start" value="{{ filters.start }}" class="form-control">
+          </div>
+
+          <div class="col-6 col-md-2">
+            <label class="gf-filter-label">End Date</label>
+            <input type="date" name="end" value="{{ filters.end }}" class="form-control">
+          </div>
+
+          <div class="col-12 col-md-1 d-grid align-items-end">
+            <button class="btn btn-primary gf-filter-actions" type="submit" title="Apply filters">
+              <i class="bi bi-funnel"></i>
+              <span class="d-md-none ms-1">Apply Filters</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Desktop table -->
+  <div class="gf-card d-none d-md-block mb-3">
+    <div class="gf-section pb-2">
+      <div class="gf-section-head mb-0">
+        <div>
+          <h2 class="gf-section-title">
+            <i class="bi bi-percent me-1 text-primary"></i> Discount Directory
+          </h2>
+          <p class="gf-section-subtitle">Review every discount entry, referral, reason, and staff member.</p>
+        </div>
+        <span class="badge rounded-pill bg-light text-secondary border px-3 py-2">
+          {{ summary.total_rows }} Entries
+        </span>
+      </div>
+    </div>
+
+    <div class="gf-table-wrap px-3 pb-3">
+      <table class="table gf-table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th style="width:60px;">#</th>
+            <th>Member</th>
+            <th>Branch</th>
+            <th>Plan</th>
+            <th class="text-end">Plan Price</th>
+            <th class="text-end">Discount</th>
+            <th class="text-end">Final</th>
+            <th>Referral</th>
+            <th>Reason</th>
+            <th>Given By</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for p in rows %}
+          <tr>
+            <td class="text-muted">{{ forloop.counter }}</td>
+
+            <td>
+              <div class="gf-member">
+                <div class="gf-avatar">
+                  <i class="bi bi-person-fill"></i>
+                </div>
+                <div>
+                  <div class="gf-member-name">{{ p.member.name }}</div>
+                  <div class="gf-member-phone">{{ p.member.phone }}</div>
+                </div>
+              </div>
+            </td>
+
+            <td>{{ p.member.branch.name }}</td>
+
+            <td>
+              {% if p.plan %}
+                <span class="fw-semibold">{{ p.plan.name }}</span>
+              {% else %}
+                <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+
+            <td class="text-end fw-semibold">₹{{ p.plan_price }}</td>
+
+            <td class="text-end">
+              <span class="gf-discount-amount fw-bold">₹{{ p.discount_amount }}</span>
+            </td>
+
+            <td class="text-end gf-final-amount">₹{{ p.final_amount }}</td>
+
+            <td>
+              <span class="gf-referral">{{ p.referral_name|default:"-" }}</span>
+            </td>
+
+            <td>
+              <span class="gf-reason">{{ p.discount_reason|default:"-" }}</span>
+            </td>
+
+            <td>
+              {% if p.created_by %}
+                <span class="fw-semibold">
+                  {{ p.created_by.first_name|default:p.created_by.username }}
+                </span>
+                <div class="gf-staff-role">{{ p.created_by.role }}</div>
+              {% else %}
+                <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+
+            <td class="gf-date">{{ p.payment_date|date:"Y-m-d" }}</td>
+          </tr>
+
+          {% empty %}
+          <tr>
+            <td colspan="11">
+              <div class="gf-empty">
+                <div class="gf-empty-icon">
+                  <i class="bi bi-tags"></i>
+                </div>
+                <div class="fw-semibold text-dark">No discounts found</div>
+                <div class="small mt-1">No discount entries match the selected filters.</div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mobile cards -->
+  <div class="d-block d-md-none">
+    <div class="gf-section-head px-1 mb-2">
+      <div>
+        <h2 class="gf-section-title">
+          <i class="bi bi-percent me-1 text-primary"></i> Discount Directory
+        </h2>
+        <p class="gf-section-subtitle">Recent discount activity</p>
+      </div>
+      <span class="badge rounded-pill bg-light text-secondary border px-2 py-1">
+        {{ summary.total_rows }}
+      </span>
+    </div>
+
+    {% for p in rows %}
+    <div class="gf-card gf-mobile-card mb-3">
+
+      <div class="gf-mobile-top">
+        <div class="gf-member">
+          <div class="gf-avatar">
+            <i class="bi bi-person-fill"></i>
+          </div>
+          <div>
+            <div class="gf-member-name">{{ p.member.name }}</div>
+            <div class="gf-member-phone">{{ p.member.phone }}</div>
+          </div>
+        </div>
+
+        <span class="gf-mobile-date">{{ p.payment_date|date:"Y-m-d" }}</span>
+      </div>
+
+      <div class="gf-mobile-summary">
+        <div>
+          <div class="gf-mobile-summary-label">Discount Given</div>
+          <div class="gf-mobile-summary-value text-danger">₹{{ p.discount_amount }}</div>
+        </div>
+        <div class="text-end">
+          <div class="gf-mobile-summary-label">Final Amount</div>
+          <div class="gf-mobile-summary-value">₹{{ p.final_amount }}</div>
+        </div>
+      </div>
+
+      <div class="gf-mobile-grid">
+        <div class="gf-mobile-item">
+          <span class="gf-mobile-label">Branch</span>
+          <span class="gf-mobile-value">{{ p.member.branch.name }}</span>
+        </div>
+
+        <div class="gf-mobile-item">
+          <span class="gf-mobile-label">Plan</span>
+          <span class="gf-mobile-value">
+            {% if p.plan %}
+              {{ p.plan.name }}
+            {% else %}
+              -
+            {% endif %}
+          </span>
+        </div>
+
+        <div class="gf-mobile-item">
+          <span class="gf-mobile-label">Plan Price</span>
+          <span class="gf-mobile-value">₹{{ p.plan_price }}</span>
+        </div>
+
+        <div class="gf-mobile-item">
+          <span class="gf-mobile-label">Referral</span>
+          <span class="gf-mobile-value">{{ p.referral_name|default:"-" }}</span>
+        </div>
+
+        <div class="gf-mobile-item">
+          <span class="gf-mobile-label">Reason</span>
+          <span class="gf-mobile-value">{{ p.discount_reason|default:"-" }}</span>
+        </div>
+
+        <div class="gf-mobile-item">
+          <span class="gf-mobile-label">Given By</span>
+          <span class="gf-mobile-value">
+            {% if p.created_by %}
+              {{ p.created_by.first_name|default:p.created_by.username }}
+              <small class="d-block text-muted">{{ p.created_by.role }}</small>
+            {% else %}
+              -
+            {% endif %}
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+    {% empty %}
+    <div class="gf-card">
+      <div class="gf-empty">
+        <div class="gf-empty-icon">
+          <i class="bi bi-tags"></i>
+        </div>
+        <div class="fw-semibold text-dark">No discounts found</div>
+        <div class="small mt-1">No discount entries match the selected filters.</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+{% endblock %}

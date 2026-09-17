@@ -1,0 +1,1225 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/modal_card.css' %}">
+<link rel="stylesheet" href="{% static 'css/add_member.css' %}">
+
+<style>
+:root{
+    --gf-primary:#2f6fed;--gf-primary-dark:#245bd0;--gf-primary-soft:#edf4ff;
+    --gf-page:#f4f7fb;--gf-border:#e4e9f2;--gf-text:#172033;--gf-muted:#7d8aa5;
+    --gf-radius:18px;--gf-shadow:0 8px 24px rgba(28,48,86,.07);
+}
+button,.btn{touch-action:manipulation}
+.members-page{min-height:calc(100vh - 70px);background:var(--gf-page);color:var(--gf-text)}
+.members-page .page-header,.members-page .filter-card,.members-page .members-card{
+    background:#fff;border:1px solid var(--gf-border);border-radius:var(--gf-radius);box-shadow:var(--gf-shadow)
+}
+.members-page .page-header{padding:22px 24px;margin-bottom:18px}
+.members-page .eyebrow{display:flex;align-items:center;gap:8px;color:var(--gf-primary);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.members-page .eyebrow i{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;background:var(--gf-primary-soft);border-radius:9px;font-size:15px}
+.members-page .page-title{margin:0;font-size:24px;font-weight:750;letter-spacing:-.02em}
+.members-page .page-subtitle{margin:4px 0 0;color:var(--gf-muted);font-size:14px}
+.members-page .btn-primary{background:var(--gf-primary);border-color:var(--gf-primary);border-radius:11px;font-weight:650;padding:10px 16px}
+.members-page .btn-primary:hover{background:var(--gf-primary-dark);border-color:var(--gf-primary-dark)}
+.members-page .export-btn{border-radius:11px;padding:10px 15px;font-weight:600;border-color:#dce4ef;color:#53617a}
+.members-page .filter-card{padding:20px;margin-bottom:18px}
+.members-page .section-heading{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.members-page .section-heading .section-icon{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;background:var(--gf-primary-soft);color:var(--gf-primary);border-radius:10px}
+.members-page .section-heading h6{margin:0;font-weight:750;font-size:15px}
+.members-page .section-heading p{margin:2px 0 0;color:var(--gf-muted);font-size:12px}
+.members-page .form-label{color:#8793a9;font-size:12px;font-weight:650;margin-bottom:7px}
+.members-page .form-control,.members-page .form-select{min-height:44px;border:1px solid #dfe5ef;border-radius:11px;color:#27334a;background:#fff;box-shadow:none}
+.members-page .form-control::placeholder{color:#aeb8ca}
+.members-page .form-control:focus,.members-page .form-select:focus{border-color:#8db2ff;box-shadow:0 0 0 3px rgba(47,111,237,.10)}
+.members-page .filter-actions{padding-top:3px}
+.members-page .members-card{overflow:hidden}
+.members-page .members-card-header{padding:18px 20px;border-bottom:1px solid var(--gf-border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.members-page .members-card-header h6{margin:0;font-weight:750;font-size:15px}
+.members-page .directory-note{color:var(--gf-muted);font-size:12px}
+.members-page .table-wrap{overflow-x:auto}
+.members-page table{margin-bottom:0!important}
+.members-page thead th{background:#f8faff;color:#8793a9!important;border-bottom:1px solid var(--gf-border);font-size:11px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;padding:14px 16px!important}
+.members-page tbody td{border-color:#edf1f6;color:#344057;font-size:13px;padding:14px 16px!important;vertical-align:middle}
+.members-page tbody tr:hover{background:#fbfcff}
+.members-page .member-name{color:#1d2940;font-weight:700;line-height:1.2}
+.members-page .member-id{display:block;color:var(--gf-muted);font-size:11px;margin-top:3px;font-weight:500}
+.members-page .member-avatar{width:42px;height:42px;flex:0 0 42px;border-radius:12px!important;border:0!important;background:var(--gf-primary-soft)!important;color:var(--gf-primary);font-weight:750}
+.members-page .status-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.members-page .status-pill:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.members-page .status-active{color:#1f9d61;background:#eaf9f1}
+.members-page .status-expiring{color:#a97700;background:#fff6dc}
+.members-page .status-expired{color:#d44949;background:#fff0f0}
+.members-page .action-btn{width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;background:#fff;border:1px solid #e1e7f0;color:#63708a}
+.members-page .action-btn:hover{border-color:#b9cdf5;color:var(--gf-primary);background:var(--gf-primary-soft)}
+.members-page .action-btn.delete-member-btn:hover{color:#d44949;border-color:#f0b9b9;background:#fff3f3}
+.members-page .mobile-member-card{background:#fff;border:1px solid var(--gf-border);border-radius:16px;box-shadow:var(--gf-shadow)}
+.members-page .mobile-detail{color:#69758d;font-size:12px;line-height:1.8}
+.members-page .mobile-detail strong{color:#344057}
+.members-page .mobile-actions .btn{min-height:52px;border:1px solid #e1e7f0;border-radius:11px!important;color:#59677f;background:#fff}
+.modal-content{border:0;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(20,36,70,.18)}
+.modal-header{border-bottom:1px solid #edf1f6;padding:18px 22px}
+.modal-footer{border-top:1px solid #edf1f6;padding:14px 22px}
+.modal-body{padding:22px}
+@media(max-width:767.98px){
+    .members-page{padding-top:8px}.members-page .page-header{padding:18px}
+    .members-page .page-title{font-size:20px}
+    .members-page .page-header .header-actions{width:100%;margin-top:14px}
+    .members-page .page-header .header-actions .btn{flex:1}
+    .members-page .filter-card{padding:16px}
+}
+</style>
+
+<div class="members-page container-fluid px-3 px-lg-4 py-4">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm"
+        role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    <div class="page-header">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+            <div>
+                <div class="eyebrow"><i class="bi bi-people-fill"></i> Member Management</div>
+                <h1 class="page-title">Members</h1>
+                <p class="page-subtitle">View, search and manage your gym members.</p>
+            </div>
+            <div class="d-flex gap-2 header-actions">
+                <button class="btn btn-outline-secondary export-btn" id="exportCsv">
+                    <i class="bi bi-download me-1"></i> Export
+                </button>
+                <a href="{% url 'Add_members' %}" class="btn btn-primary">
+                    <i class="bi bi-person-plus me-1"></i> Add Member
+                </a>
+            </div>
+        </div>
+    </div>
+    <form method="get">
+        <div class="card shadow-sm border-0 mb-3">
+          <div class="card-body">
+            <div class="row g-2">
+      
+              <!-- Search -->
+              <div class="col-12 col-md-4">
+                <input type="text"
+                       name="q"
+                       value="{{ q }}"
+                       class="form-control"
+                       placeholder="Search name or phone">
+              </div>
+      
+              <!-- Branch -->
+              <div class="col-12 col-md-4">
+                <select name="branch" class="form-select">
+                  <option value="">All Branches</option>
+                  {% for b in branches %}
+                    <option value="{{ b.id }}"
+                      {% if branch == b.id|stringformat:"s" %}selected{% endif %}>
+                      {{ b.name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+      
+              <!-- Status -->
+              <div class="col-12 col-md-4">
+                <select name="status" class="form-select">
+                  <option value="">All Status</option>
+                  <option value="active" {% if status == "active" %}selected{% endif %}>Active</option>
+                  <option value="expiring" {% if status == "expiring" %}selected{% endif %}>Expiring</option>
+                  <option value="expired" {% if status == "expired" %}selected{% endif %}>Expired</option>
+                </select>
+              </div>
+      
+              <!-- Buttons -->
+              <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <a href="{% url 'member_list' %}" class="btn btn-outline-secondary">Reset</a>
+              </div>
+      
+            </div>
+          </div>
+        </div>
+      </form>
+    <div class="members-card d-none d-md-block">
+        <div class="members-card-header">
+            <div>
+                <h6><i class="bi bi-person-vcard me-2 text-primary"></i>Member Directory</h6>
+                <span class="directory-note">Manage member details, plans and membership status.</span>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table class="table table-hover align-middle" id="membersTable">
+                <thead class="table">
+                    <tr>
+                        <th class="fw-semibold text-muted">#</th>
+
+                        <th class="fw-semibold text-muted">Name</th>
+                        <th class="fw-semibold text-muted">Phone</th>
+                        <th class="fw-semibold text-muted">Branch</th>
+                        <th class="fw-semibold text-muted">Plan</th>
+                        <th class="fw-semibold text-muted">Join Date</th>
+                        <th class="fw-semibold text-muted">Expiry</th>
+                        <th class="fw-semibold text-muted">Status</th>
+                        <th class="text-center fw-semibold text-muted">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in members %}
+                    <tr>
+                        <td class="py-3">{{ forloop.counter }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                {% if m.photo %}
+                                <img src="{{ m.photo.url }}" alt="{{ m.name }}" class="member-avatar" style="object-fit:cover;">
+                                {% else %}
+                                <div class="member-avatar d-flex align-items-center justify-content-center">{{ m.name|slice:":1"|upper }}</div>
+                                {% endif %}
+                                <div>
+                                    <div class="member-name">{{ m.name }}</div>
+                                    <span class="member-id">ID: {{ m.admission_number }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3">{{ m.phone }}</td>
+                        <td class="py-3">{{ m.branch.name }}</td>
+                        <td class="py-3">
+                            {% if m.plan %}
+                            {{ m.plan.name }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td class="py-3">{{ m.join_date|date:"Y-m-d" }}</td>
+                        <td class="py-3">{{ m.expiry_date|date:"Y-m-d" }}</td>
+
+                        <td>
+                            {% if m.status == "active" %}
+                            <span class="status-pill status-active">Active</span>
+                            {% elif m.status == "expiring" %}
+                            <span class="status-pill status-expiring">Expiring</span>
+                            {% else %}
+                            <span class="status-pill status-expired">Expired</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-1">
+
+                                <!-- View -->
+                                <a href="#" class="btn action-btn" title="View" hreflang="view"
+                                    onclick="openMemberDetails('{{ m.id }}')">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+
+                                <!-- Renew -->
+                                <!-- <a href="#" class="btn btn-sm btn-primary" title="Renew" hreflang="Renew"
+                                    onclick="openRenewModal('{{ m.id }}')">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </a> -->
+
+                                <!-- Edit -->
+                                <a type="button" class="btn action-btn dit-plan-btn" title="Edit" hreflang="Edit"
+                                   data-id="{{ m.id }}"
+                                    >
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                {% if request.user.role == "ADMIN" %}
+                                <!-- Delete -->
+                                <a href="#" class="btn action-btn delete-member-btn" data-id="{{ m.id }}"
+                                    title="Delete" hreflang="Delete" >
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="empty-state">
+                            <i class="bi bi-people fs-2 text-muted"></i>
+                            <p class="text-muted mt-2 mb-0">No members yet</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+
+
+    <!-- MOBILE VIEW -->
+<div class="d-block d-md-none">
+
+    {% for m in members %}
+    <div class="mobile-member-card mb-3">
+      <div class="card-body p-3">
+  
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-start">
+  
+          <!-- Profile -->
+          <div class="d-flex align-items-center gap-2">
+            {% if m.photo %}
+            <img src="{{ m.photo.url }}" width="50" height="50"
+                 class="rounded-circle border" style="object-fit: cover;">
+            {% else %}
+            <div class="rounded-circle border d-flex align-items-center justify-content-center"
+                 style="width:50px;height:50px;background:#f1f3f5;font-weight:600;">
+              {{ m.name|slice:":1"|upper }}
+            </div>
+            {% endif %}
+  
+            <div>
+              <div class="fw-semibold" style="font-size:15px;">
+                {{ m.name }}
+              </div>
+              <small class="text-muted">
+                ID: {{ m.admission_number }}
+              </small>
+            </div>
+          </div>
+  
+          <!-- Status -->
+          <div>
+            {% if m.status == "active" %}
+              <span class="status-pill status-active">Active</span>
+            {% elif m.status == "expiring" %}
+              <span class="status-pill status-expiring">Expiring</span>
+            {% else %}
+              <span class="status-pill status-expired">Expired</span>
+            {% endif %}
+          </div>
+  
+        </div>
+  
+        <hr class="my-2">
+  
+        <!-- Details -->
+        <div class="mobile-detail">
+          <div><strong class="text-dark">📞</strong> {{ m.phone }}</div>
+          <div><strong class="text-dark">🏢</strong> {{ m.branch.name }}</div>
+          <div><strong class="text-dark">📦</strong> {{ m.plan.name|default:"-" }}</div>
+          <div><strong class="text-dark">📅 Join:</strong> {{ m.join_date|date:"Y-m-d" }}</div>
+          <div><strong class="text-dark">📅 Expiry:</strong> {{ m.expiry_date|date:"Y-m-d" }}</div>
+        </div>
+  
+        <!-- Actions -->
+        <div class="mt-3 d-flex justify-content-between gap-2 mobile-actions">
+  
+          <!-- View -->
+          <button class="btn btn-light flex-fill text-center"
+                  onclick="openMemberDetails('{{ m.id }}')"
+                  style="border-radius:10px;">
+            <i class="bi bi-eye fs-5"></i>
+            <div style="font-size:11px;">View</div>
+          </button>
+  
+          <!-- Edit -->
+          <button class="btn btn-light flex-fill text-center dit-plan-btn"
+                  
+                  data-id="{{ m.id }}"
+                  style="border-radius:10px;">
+            <i class="bi bi-pencil fs-5 text-primary"></i>
+            <div style="font-size:11px;">Edit</div>
+          </button>
+  
+          {% if request.user.role == "ADMIN" %}
+          <!-- Delete -->
+          <button class="btn btn-light flex-fill text-center text-danger delete-member-btn"
+                  data-id="{{ m.id }}"
+                  style="border-radius:10px;">
+            <i class="bi bi-trash fs-5"></i>
+            <div style="font-size:11px;">Delete</div>
+          </button>
+          {% endif %}
+  
+        </div>
+  
+      </div>
+    </div>
+  
+    {% empty %}
+    <div class="text-center py-5">
+      <i class="bi bi-people fs-2 text-muted"></i>
+      <p class="text-muted mt-2 mb-0">No members yet</p>
+    </div>
+    {% endfor %}
+  
+  </div>
+
+</div>
+
+
+<!-- Member Edit -->
+<!-- Member Edit -->
+<div class="modal fade" id="Member_edit" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Member Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- IMPORTANT: enctype added -->
+                <form method="post" id="editMemberForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <h6 class="text-uppercase fw-bold text-secondary mb-3">Member Info</h6>
+
+                    <div class="row">
+
+                        <!-- PHOTO SECTION -->
+                        <div class="col-12 mb-4">
+                            <div class="member-photo-card">
+                                <div class="member-photo-title">Member Photo</div>
+
+                                <div class="photo-upload-wrap">
+
+                                    <!-- LEFT -->
+                                    <div class="photo-left">
+                                        <div class="photo-avatar-box">
+
+                                            <img id="edit_photo_preview"
+                                                 src="{% static 'img/user-placeholder.png' %}"
+                                                 onclick="startCamera()"
+                                                 onerror="this.src='https://ui-avatars.com/api/?name=Member'">
+
+                                            <!-- Camera -->
+                                            <button type="button"
+                                                    onclick="startCamera()"
+                                                    class="btn btn-primary photo-camera-btn">
+                                                <i class="bi bi-camera-fill"></i>
+                                            </button>
+
+                                            <!-- Upload -->
+                                            <button type="button"
+                                                    onclick="document.getElementById('edit_photo_input').click()"
+                                                    class="btn btn-light photo-upload-btn">
+                                                <i class="bi bi-upload"></i>
+                                            </button>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- RIGHT -->
+                                    <div class="photo-info">
+                                        <h6>Update profile photo</h6>
+                                        <p>Use camera or upload from device</p>
+
+                                        <div class="dob-input">
+                                            <label class="form-label small text-muted">Date of Birth</label>
+                                            <input type="date"
+                                                   id="edit_dob"
+                                                   name="date_of_birth"
+                                                   class="form-control">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <!-- Hidden -->
+                                <input type="hidden" name="captured_photo" id="edit_captured_photo">
+
+                                <!-- File -->
+                                <input type="file"
+                                       name="photo"
+                                       id="edit_photo_input"
+                                       accept="image/*"
+                                       style="display:none">
+
+                                <!-- Camera Panel -->
+                                <div id="edit_camera_container" class="camera-panel" style="display:none;">
+                                    <video id="edit_video" autoplay playsinline></video>
+
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-success" onclick="capturePhoto()">
+                                            Capture
+                                        </button>
+                                        <button type="button" class="btn btn-danger" onclick="stopCamera()">
+                                            Close
+                                        </button>
+                                    </div>
+
+                                    <canvas id="edit_canvas" style="display:none;"></canvas>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- HIDDEN ID -->
+                        <input type="hidden" name="save_member_id" id="save_member_id">
+
+                        <!-- NAME -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small">Name</label>
+                            <input type="text" name="member_name" class="form-control" required>
+                        </div>
+
+                        <!-- PHONE -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small">Phone</label>
+                            <input type="number" name="Phone_number" class="form-control" required>
+                        </div>
+
+                    </div>
+
+                    <!-- ACTION -->
+                    <div class="text-end mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            Save Changes
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Member Edit -->
+
+
+<!-- Member Details Modal -->
+<div class="modal fade" id="memberDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Member Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Member Summary -->
+                <div class="row g-3 shadow-sm">
+                    <div class="col-md-6 ">
+                        <div class="border rounded p-3">
+                            <div><b>Name:</b> <span id="md_name">-</span></div>
+                            <div><b>Phone:</b> <span id="md_phone">-</span></div>
+                            <div><b>Status:</b> <span id="md_status" class="badge rounded-pill bg-success">-</span>
+                            </div>
+                            <div><b>Join Date:</b> <span id="md_join_date">-</span></div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 ">
+                        <div class="border rounded p-3">
+                            <div><b>Gym:</b> <span id="md_gym">-</span></div>
+                            <div><b>Branch:</b> <span id="md_branch">-</span></div>
+                            <div><b>Plan:</b> <span id="md_plan">-</span></div>
+                            <div><b>Plan Valid:</b> <span id="md_validity">-</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Payment Summary -->
+                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                    <h6 class="mb-0">Payment History</h6>
+                    <div class="text-end">
+                        <span class="me-3"><b>Total Paid:</b> ₹<span id="md_total_paid">0</span></span>
+                        <span class="me-3"><b>Total Discount:</b> ₹<span id="md_total_discount">0</span></span>
+                        <span class="me-3"><b>Total Final:</b> ₹<span id="md_total_final">0</span></span>
+                        <span class="me-3"><b>Pending:</b> ₹<span id="md_total_pending">0</span></span>
+                        <span><b>Last Payment:</b> <span id="md_last_payment">-</span></span>
+                    </div>
+                </div>
+
+                <!-- Payment Table -->
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered align-middle">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">#</th>
+                                <th>Invoice</th>
+                                <th>Payment Date</th>
+                                <th>Plan</th>
+                                <th>Plan Price</th>
+                                <th>Discount</th>
+                                <th>Final</th>
+                                <th>Paid</th>
+                                <th>Mode</th>
+                                <th>Reason</th>
+                                <th>Given By</th>
+                                <th>Coverage Start</th>
+                                <th>Coverage End</th>
+                            </tr>
+                        </thead>
+                        <tbody id="md_payments_tbody">
+                            <tr>
+                                <td colspan="13" class="text-center">No payments</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Plan Renewal Modal -->
+<div class="modal fade" id="renewPlanModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Renew Membership</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="renewPlanForm">
+                <div class="modal-body">
+
+                    <!-- hidden -->
+                    <input type="hidden" id="renew_member_id" name="member_id">
+                    <input type="hidden" id="renew_branch_id" name="branch_id">
+
+                    <!-- Member -->
+                    <div class="mb-2">
+                        <label class="form-label">Member Name</label>
+                        <input type="text" id="renew_member_name" class="form-control" readonly>
+                    </div>
+
+                    <!-- Branch -->
+                    <div class="mb-2">
+                        <label class="form-label">Branch</label>
+                        <input type="text" id="renew_branch_name" class="form-control" readonly>
+                    </div>
+
+                    <!-- Current Expiry -->
+                    <div class="mb-2">
+                        <label class="form-label">Current Expiry</label>
+                        <input type="text" id="renew_current_expiry" class="form-control" readonly>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Plane Start</label>
+                        <input type="date" id="renew_Plane_current_expiry" name="renew_Plane_current_expiry"
+                            class="form-control">
+                    </div>
+                    <hr>
+
+                    <!-- Select Plan -->
+                    <div class="mb-2">
+                        <label class="form-label">Select Plan</label>
+                        <select id="renew_plan" name="plan_id" class="form-select" required>
+                            <option value="">Choose plan</option>
+                        </select>
+                    </div>
+
+                    <!-- Amount -->
+                    <div class="mb-2">
+                        <label class="form-label">Amount</label>
+                        <input type="number" id="renew_amount" name="amount" class="form-control" required readonly>
+                    </div>
+
+                    <!-- Payment Mode -->
+                    <div class="mb-2">
+                        <label class="form-label">Payment Mode</label>
+                        <select name="payment_mode" class="form-select" required>
+                            <option value="cash">Cash</option>
+                            <option value="upi">UPI</option>
+                        </select>
+                    </div>
+
+                    <!-- New validity preview -->
+                    <div class="alert alert-info mb-0">
+                        New Expiry: <b id="renew_new_expiry">-</b>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Confirm Renewal</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+{% if whatsapp_url or invoice_id %}
+<!-- WhatsApp Modal -->
+<div class="modal fade" id="whatsappModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Send Receipt</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body text-center">
+
+                <p class="mb-3">
+                    Receipt is ready ✅ <br>
+                    Click below to preview the invoice.
+                </p>
+
+                {% if invoice_id %}
+                <a href="{% url 'generate_invoice_pdf' invoice_id %}" target="_blank" class="btn btn-primary">
+                    <i class="bi bi-filetype-pdf me-1"></i> View PDF
+                </a>
+                {% endif %}
+
+            </div>
+
+            <div class="modal-footer justify-content-between">
+
+                {% if whatsapp_url %}
+                <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-success">
+                    <i class="bi bi-whatsapp me-1"></i> Open WhatsApp
+                </a>
+                {% endif %}
+
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Later
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+    function num(id) {
+        const v = parseFloat(document.getElementById(id)?.value || 0);
+        return isNaN(v) ? 0 : v;
+    }
+    
+    function calcAmounts() {
+        const price = num("price");
+        const discount = num("discount_amount");
+        const finalAmt = Math.max(price - discount, 0);
+    
+        const paid = num("paid_amount");
+        const pending = Math.max(finalAmt - paid, 0);
+    }
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        ["discount_amount", "paid_amount"].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener("input", calcAmounts);
+        });
+        calcAmounts();
+    });
+    
+    
+    $(function () {
+    
+        let stream = null;
+    
+        function getContext() {
+            if ($("#Member_edit").hasClass("show")) {
+                return {
+                    video: document.getElementById("edit_video"),
+                    canvas: document.getElementById("edit_canvas"),
+                    preview: $("#edit_photo_preview"),
+                    container: $("#edit_camera_container"),
+                    captured: $("#edit_captured_photo"),
+                    fileInput: $("#edit_photo_input")
+                };
+            } else {
+                return {
+                    video: document.getElementById("video"),
+                    canvas: document.getElementById("canvas"),
+                    preview: $("#photo_preview"),
+                    container: $("#camera_container"),
+                    captured: $("#captured_photo"),
+                    fileInput: $("#photo_input")
+                };
+            }
+        }
+    
+        // 🔥 Open Camera
+        window.startCamera = async function () {
+            const ctx = getContext();
+    
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "environment" },
+                    audio: false
+                });
+    
+                if (ctx.video) ctx.video.srcObject = stream;
+                ctx.container.show();
+    
+            } catch (err) {
+                alert("Camera not supported or permission denied");
+            }
+        };
+    
+        // 📸 Capture Photo (BASE64 only for camera)
+        window.capturePhoto = function () {
+            const ctx = getContext();
+    
+            if (!ctx.video || !ctx.canvas) return;
+    
+            const c = ctx.canvas.getContext("2d");
+    
+            ctx.canvas.width = ctx.video.videoWidth || 300;
+            ctx.canvas.height = ctx.video.videoHeight || 300;
+    
+            c.drawImage(ctx.video, 0, 0, ctx.canvas.width, ctx.canvas.height);
+    
+            const imageData = ctx.canvas.toDataURL("image/jpeg", 0.7);
+    
+            ctx.preview.attr("src", imageData);
+            ctx.captured.val(imageData);
+    
+            // 🔥 clear file input (important)
+            ctx.fileInput.val("");
+    
+            stopCamera();
+        };
+    
+        // ❌ Stop Camera
+        window.stopCamera = function () {
+            const ctx = getContext();
+    
+            if (stream) {
+                stream.getTracks().forEach(t => t.stop());
+                stream = null;
+            }
+    
+            ctx.container.hide();
+        };
+    
+        // 📁 Upload (ADD)
+        $("#photo_input").on("change", function (event) {
+            handleUpload(event, "#photo_preview", "#captured_photo");
+        });
+    
+        // 📁 Upload (EDIT)
+        $("#edit_photo_input").on("change", function (event) {
+            handleUpload(event, "#edit_photo_preview", "#edit_captured_photo");
+        });
+    
+        // 🔁 FIXED upload (NO BASE64)
+        function handleUpload(event, previewId, hiddenId) {
+            const file = event.target.files[0];
+            if (!file) return;
+    
+            stopCamera();
+    
+            // ✅ Preview only
+            const url = URL.createObjectURL(file);
+            $(previewId).attr("src", url);
+    
+            // ❌ IMPORTANT: clear base64
+            $(hiddenId).val("");
+        }
+    
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = new bootstrap.Modal(document.getElementById("whatsappModal"));
+        modal.show();
+    });
+</script>
+
+
+
+
+<script src="{% static 'Js/datatable.js' %}"></script>
+<script>
+    $(document).on("click", ".delete-member-btn", function (e) {
+
+        let planId = $(this).data("id");
+        console.log(planId)
+
+        if (!confirm("Are you sure you want to delete this Member?")) return;
+
+        $.ajax({
+            url: `/member/${planId}/delete/`,
+            type: "POST",
+            data: {
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function (res) {
+                location.reload();
+            },
+            error: function () {
+                alert("Something went wrong while deleting.");
+            }
+        });
+    });
+
+    // OPEN EDIT MODAL + LOAD DATA
+    $(document).on("click", ".dit-plan-btn", function (e) {
+        e.preventDefault();
+    
+        const memberId = $(this).data("id");
+    
+        console.log("CLICK OK:", memberId); // DEBUG
+    
+        const modalEl = document.getElementById('Member_edit');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    
+        modal.show();
+    
+        $.get(`/member/${memberId}/data/`)
+            .done(function (data) {
+    
+                console.log("DATA:", data); // DEBUG
+    
+                $("#save_member_id").val(data.ids || "");
+                $("input[name='member_name']").val(data.name || "");
+                $("input[name='Phone_number']").val(data.phone || "");
+                $("#edit_dob").val(data.dob || "");
+    
+                $("#edit_captured_photo").val("");
+    
+                $("#edit_photo_preview").attr(
+                    "src",
+                    data.photo || "/static/img/user-placeholder.png"
+                );
+    
+            })
+            .fail(function () {
+                alert("Failed to load member data");
+            });
+    });
+
+
+// SUBMIT FORM (AJAX)
+$("#editMemberForm").submit(function (e) {
+    e.preventDefault();
+
+    let memberId = $("#save_member_id").val();
+
+    let formData = new FormData(this);
+
+    $.ajax({
+        url: `/member/${memberId}/update/`,
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: {
+            "X-CSRFToken": $("input[name=csrfmiddlewaretoken]").val()
+        },
+        success: function (res) {
+            if (res.success) {
+                alert("Updated successfully ✅");
+                location.reload();
+            } else {
+                alert(res.error || "Update failed");
+            }
+        },
+        error: function () {
+            alert("Something went wrong ❌");
+        }
+    });
+});
+
+
+
+//    $("#Member_edit form").submit(function (e) {
+//        e.preventDefault();
+//
+//        let MemberId = $("#save_member_id").val();
+//
+//        $.ajax({
+//            url: `/member/${MemberId}/update/`,
+//            type: "POST",
+//            data: $(this).serialize(),
+//            success: function (response) {
+//                $("#Member_edit").modal("hide");
+//                confirm("Updated Successfully")
+//                location.reload();
+//            },
+//            error: function () {
+//                alert("Error updating plan");
+//            }
+//        });
+//    });
+
+    function safeText(v) {
+        return (v === null || v === undefined || v === "") ? "-" : v;
+    }
+    // ---------- member details ----------
+    function setStatusBadge(label) {
+        const $el = $("#md_status");
+        $el.text(safeText(label));
+
+        // reset classes
+        $el.removeClass("bg-success bg-danger bg-warning text-dark");
+
+        const l = String(label || "").toLowerCase();
+        if (l.includes("active")) $el.addClass("bg-success");
+        else if (l.includes("expired")) $el.addClass("bg-danger");
+        else if (l.includes("expir")) $el.addClass("bg-warning text-dark");
+        else $el.addClass("bg-secondary");
+    }
+    function formatMoney(value) {
+        const num = parseFloat(value || 0);
+        return num.toLocaleString("en-IN", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    function openMemberDetails(memberId) {
+        $.ajax({
+            url: `/members/${memberId}/full-details/`,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                // Member
+                $("#md_name").text(safeText(data.member.name));
+                $("#md_phone").text(safeText(data.member.phone));
+                setStatusBadge(data.member.status_label);
+                $("#md_join_date").text(safeText(data.member.join_date));
+
+                $("#md_gym").text(safeText(data.member.gym_name));
+                $("#md_branch").text(safeText(data.member.branch_name));
+
+                $("#md_plan").text(
+                    data.member.plan_name
+                        ? `${data.member.plan_name} (₹${safeText(data.member.plan_price)})`
+                        : "-"
+                );
+
+                $("#md_validity").text(
+                    `${safeText(data.member.start_date)} → ${safeText(data.member.expiry_date)}`
+                );
+
+                // Summary
+                $("#md_total_paid").text(formatMoney(data.summary.total_paid));
+                $("#md_total_discount").text(formatMoney(data.summary.total_discount));
+                $("#md_total_final").text(formatMoney(data.summary.total_final_amount));
+                $("#md_total_pending").text(formatMoney(data.summary.total_pending));
+                $("#md_last_payment").text(safeText(data.summary.last_payment_date));
+
+                // Payments table
+                const $tbody = $("#md_payments_tbody");
+                $tbody.empty();
+
+                if (!data.payments || data.payments.length === 0) {
+                    $tbody.html(`<tr><td colspan="13" class="text-center text-muted">No payments</td></tr>`);
+                } else {
+                    $.each(data.payments, function (idx, p) {
+                        const givenBy = p.created_by_name
+                            ? `${p.created_by_name}${p.created_by_role ? ` (${p.created_by_role})` : ""}`
+                            : "-";
+
+                        $tbody.append(`
+              <tr>
+                <td>${idx + 1}</td>
+                <td>${safeText(p.invoice_no)}</td>
+                <td>${safeText(p.payment_date)}</td>
+                <td>${safeText(p.plan_name)}</td>
+                <td>₹${formatMoney(p.plan_price)}</td>
+                <td class="text-danger fw-semibold">₹${formatMoney(p.discount_amount)}</td>
+                <td class="fw-semibold">₹${formatMoney(p.final_amount)}</td>
+                <td class="text-success fw-semibold">₹${formatMoney(p.amount)}</td>
+                <td>${safeText(p.payment_mode_label)}</td>
+                <td>${safeText(p.discount_reason || "-")}</td>
+                <td>${givenBy}</td>
+                <td>${safeText(p.coverage_start)}</td>
+                <td>${safeText(p.coverage_end)}</td>
+              </tr>
+            `);
+                    });
+                }
+
+                // Show modal (Bootstrap 5)
+                const modalEl = document.getElementById("memberDetailsModal");
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            },
+            error: function (xhr, status, err) {
+                console.error("Error loading member details:", err);
+                alert(xhr.responseJSON?.error || "Failed to load member details");
+            }
+        });
+    }
+    // CSRF (needed for Django POST)
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    $.ajaxSetup({
+        headers: { "X-CSRFToken": getCookie("csrftoken") }
+    });
+
+
+    // YYYY-MM-DD -> Date (local)
+    function parseISODate(s) {
+        if (!s) return null;
+        const d = new Date(s + "T00:00:00");
+        return isNaN(d.getTime()) ? null : d;
+    }
+
+    function toISODate(d) {
+        return d.toISOString().split("T")[0];
+    }
+
+    // ---------- Renewal Modal Open ----------
+    function openRenewModal(memberId) {
+        // reset form
+        $("#renewPlanForm")[0].reset();
+        $("#renew_plan").html('<option value="">Choose plan</option>');
+        $("#renew_new_expiry").text("-");
+
+        $.get(`/members/${memberId}/full-details/`)
+            .done(function (data) {
+                $("#renew_member_id").val(data.member.id);
+                $("#renew_member_name").val(safeText(data.member.name));
+                $("#renew_branch_id").val(data.member.branch_id);
+                $("#renew_branch_name").val(safeText(data.member.branch_name));
+                $("#renew_current_expiry").val(safeText(data.member.expiry_date));
+
+                // load plans for this branch
+                loadPlans(data.member.branch_id);
+
+                // show modal
+                const modalEl = document.getElementById("renewPlanModal");
+                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modal.show();
+            })
+            .fail(function (xhr) {
+                console.error("Failed to load member details", xhr.responseText);
+                alert("Failed to load member details");
+            });
+    }
+
+    // ---------- Load Plans ----------
+    function loadPlans(branchId) {
+        $("#renew_plan").html('<option value="">Loading...</option>');
+
+        $.get(`/branches/${branchId}/plans/`)
+            .done(function (plans) {
+                let options = '<option value="">Choose plan</option>';
+
+                $.each(plans, function (i, p) {
+                    options += `
+            <option value="${p.id}"
+                    data-price="${p.price}"
+                    data-duration="${p.duration_days}">
+              ${p.name} (₹${p.price})
+            </option>`;
+                });
+
+                $("#renew_plan").html(options);
+            })
+            .fail(function (xhr) {
+                console.error("Failed to load plans", xhr.responseText);
+                $("#renew_plan").html('<option value="">No plans found</option>');
+            });
+    }
+
+    // ---------- Plan Change: Auto amount + Correct expiry preview ----------
+    $(document).on("change", "#renew_plan", function () {
+        const $opt = $(this).find(":selected");
+        const price = $opt.data("price");
+        const duration = parseInt($opt.data("duration") || 0, 10);
+
+        $("#renew_amount").val(price || "");
+
+        if (!duration) {
+            $("#renew_new_expiry").text("-");
+            return;
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const currentExpiryStr = $("#renew_current_expiry").val();
+        const expiryDate = parseISODate(currentExpiryStr);
+
+        // ✅ Renewal start:
+        // if not expired -> start after current expiry
+        // if expired -> start today
+        let startDate = new Date(today);
+        if (expiryDate && expiryDate >= today) {
+            startDate = new Date(expiryDate);
+            startDate.setDate(startDate.getDate() + 1);
+        }
+
+        // ✅ End date = start + (duration - 1)
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + (duration - 1));
+
+        $("#renew_new_expiry").text(toISODate(endDate));
+    });
+
+    // ---------- Submit Renewal ----------
+    $(document).on("submit", "#renewPlanForm", function (e) {
+        e.preventDefault();
+
+        const memberId = $("#renew_member_id").val();
+        const url = `/members/${memberId}/renew/`;
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: $(this).serialize(),
+            dataType: "json",
+            success: function (res) {
+                if (res.success) {
+                    alert("Renewal successful ✅");
+
+                    // close modal
+                    const modalEl = document.getElementById("renewPlanModal");
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.hide();
+
+                    location.reload();
+                } else {
+                    alert(res.message || "Renewal failed");
+                }
+            },
+            error: function (xhr) {
+                console.error("Renewal error:", xhr.responseText);
+                alert("Renewal failed (check console)");
+            }
+        });
+    });
+
+
+    $(document).ready(function () {
+
+        setTimeout(function () {
+            $(".alert").slideUp("slow", function () {
+                $(this).alert('close');   // fully remove from DOM
+            });
+        }, 3000); // 5000ms = 5 sec
+
+    });
+
+</script>
+{% endblock %}

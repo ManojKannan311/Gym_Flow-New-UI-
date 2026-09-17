@@ -1,0 +1,572 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  .gf-wa-page {
+    --gf-primary: #2f6fed;
+    --gf-primary-dark: #245bd0;
+    --gf-primary-soft: #edf4ff;
+    --gf-border: #e4e9f2;
+    --gf-text: #172033;
+    --gf-muted: #7d8aa5;
+    --gf-success: #16845b;
+    --gf-success-soft: #ebf4f2;
+    --gf-warning: #b27b00;
+    --gf-warning-soft: #fff6dc;
+    --gf-shadow: 0 8px 24px rgba(25,45,80,.06);
+  }
+
+  .gf-wa-page .gf-card {
+    background: #fff;
+    border: 1px solid var(--gf-border);
+    border-radius: 16px;
+    box-shadow: var(--gf-shadow);
+  }
+
+  .gf-wa-header {
+    padding: 22px 24px;
+  }
+
+  .gf-eyebrow {
+    color: var(--gf-primary);
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .gf-title {
+    color: var(--gf-text);
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    margin: 0;
+  }
+
+  .gf-subtitle {
+    color: var(--gf-muted);
+    font-size: .86rem;
+    margin: 5px 0 0;
+  }
+
+  .gf-gym-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    background: var(--gf-primary-soft);
+    border: 1px solid #dce8ff;
+    color: var(--gf-primary);
+    font-size: .78rem;
+    font-weight: 800;
+  }
+
+  .gf-settings-card {
+    padding: 20px;
+  }
+
+  .gf-section {
+    padding: 4px 0 18px;
+  }
+
+  .gf-section + .gf-section {
+    border-top: 1px solid var(--gf-border);
+    padding-top: 20px;
+  }
+
+  .gf-section-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 17px;
+  }
+
+  .gf-section-icon {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gf-primary-soft);
+    color: var(--gf-primary);
+    font-size: 1.05rem;
+  }
+
+  .gf-section-icon.green {
+    background: var(--gf-success-soft);
+    color: var(--gf-success);
+  }
+
+  .gf-section-icon.yellow {
+    background: var(--gf-warning-soft);
+    color: var(--gf-warning);
+  }
+
+  .gf-section-title {
+    color: var(--gf-text);
+    font-size: .98rem;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .gf-section-desc {
+    color: var(--gf-muted);
+    font-size: .76rem;
+    margin: 4px 0 0;
+    line-height: 1.5;
+  }
+
+  .gf-wa-page .form-control {
+    min-height: 42px;
+    border-color: var(--gf-border);
+    border-radius: 10px;
+    font-size: .84rem;
+    box-shadow: none;
+  }
+
+  .gf-wa-page .form-control:focus {
+    border-color: var(--gf-primary);
+    box-shadow: 0 0 0 3px rgba(47,111,237,.10);
+  }
+
+  .gf-label {
+    color: #65718a;
+    font-size: .72rem;
+    font-weight: 800;
+    margin: 0 0 6px 2px;
+  }
+
+  .gf-help {
+    color: var(--gf-muted);
+    display: block;
+    font-size: .7rem;
+    line-height: 1.45;
+    margin-top: 6px;
+  }
+
+  .gf-field-card {
+    height: 100%;
+    padding: 14px;
+    background: #fbfcff;
+    border: 1px solid #edf1f7;
+    border-radius: 12px;
+  }
+
+  .gf-switch-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 15px;
+    border: 1px solid #dce8ff;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f8fbff, #fff);
+  }
+
+  .gf-switch-card .form-check-input {
+    width: 2.6em;
+    height: 1.35em;
+    cursor: pointer;
+  }
+
+  .gf-switch-card .form-check-input:checked {
+    background-color: var(--gf-primary);
+    border-color: var(--gf-primary);
+  }
+
+  .gf-switch-title {
+    color: var(--gf-text);
+    font-size: .86rem;
+    font-weight: 800;
+  }
+
+  .gf-switch-desc {
+    color: var(--gf-muted);
+    font-size: .72rem;
+    margin-top: 3px;
+  }
+
+  .gf-pro-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 999px;
+    padding: 5px 9px;
+    background: var(--gf-success-soft);
+    color: var(--gf-success);
+    border: 1px solid #d3ece4;
+    font-size: .68rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .gf-save-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding-top: 20px;
+    border-top: 1px solid var(--gf-border);
+  }
+
+  .gf-save-note {
+    color: var(--gf-muted);
+    font-size: .72rem;
+  }
+
+  .gf-save-btn {
+    border-radius: 10px;
+    font-weight: 700;
+    padding: 9px 16px;
+  }
+
+  .gf-alert {
+    border-radius: 12px;
+  }
+
+  .gf-locked {
+    padding: 34px 20px;
+    text-align: center;
+  }
+
+  .gf-locked-icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 12px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f4f8;
+    color: #8794aa;
+    font-size: 1.2rem;
+  }
+
+  @media (max-width: 767.98px) {
+    .gf-wa-page {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+
+    .gf-wa-header {
+      padding: 18px;
+    }
+
+    .gf-title {
+      font-size: 1.22rem;
+    }
+
+    .gf-wa-header > .d-flex {
+      align-items: flex-start !important;
+      flex-direction: column;
+    }
+
+    .gf-gym-chip {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .gf-settings-card {
+      padding: 16px;
+    }
+
+    .gf-section-head {
+      margin-bottom: 14px;
+    }
+
+    .gf-save-bar {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .gf-save-btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="container-fluid gf-wa-page py-2 py-md-3">
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm gf-alert mb-3"
+           role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Header -->
+  <div class="gf-card gf-wa-header mb-3">
+    <div class="d-flex justify-content-between align-items-center gap-3">
+      <div>
+        <div class="gf-eyebrow">
+          <i class="bi bi-whatsapp me-1"></i> Communication Settings
+        </div>
+        <h1 class="gf-title">WhatsApp Configuration</h1>
+        <p class="gf-subtitle">Configure automated renewal, expiry, and birthday reminders.</p>
+      </div>
+
+      <div class="gf-gym-chip">
+        <i class="bi bi-building"></i>
+        <span>{{ request.user.gym.name }}</span>
+      </div>
+    </div>
+  </div>
+
+  {% if request.user.gym.subscription_type == "pro" %}
+
+  <div class="gf-card gf-settings-card">
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <!-- Automation -->
+      <section class="gf-section">
+        <div class="gf-section-head">
+          <div class="gf-section-icon green">
+            <i class="bi bi-robot"></i>
+          </div>
+          <div>
+            <h2 class="gf-section-title">WhatsApp Automation</h2>
+            <p class="gf-section-desc">
+              Control whether automated WhatsApp reminders are sent to members.
+            </p>
+          </div>
+        </div>
+
+        <div class="gf-switch-card">
+          <div>
+            <div class="gf-switch-title">Enable WhatsApp Automation</div>
+            <div class="gf-switch-desc">Send automatic expiry reminders to members.</div>
+          </div>
+
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input"
+                   type="checkbox"
+                   name="interakt_enabled"
+                   id="interakt_enabled"
+                   {% if gym.interakt_enabled %}checked{% endif %}>
+          </div>
+        </div>
+      </section>
+
+      <!-- API Settings -->
+      <section class="gf-section">
+        <div class="gf-section-head">
+          <div class="gf-section-icon">
+            <i class="bi bi-key"></i>
+          </div>
+          <div>
+            <h2 class="gf-section-title">Interakt API Settings</h2>
+            <p class="gf-section-desc">
+              Connect GymFlow with your Interakt account for WhatsApp messaging.
+            </p>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-12 col-lg-7">
+            <div class="gf-field-card">
+              <label class="gf-label">Interakt API Key</label>
+              <input type="password"
+                     name="interakt_api_key"
+                     class="form-control"
+                     placeholder="Enter your Interakt API key"
+                     value="{{ gym.interakt_api_key }}">
+              <small class="gf-help">
+                <i class="bi bi-info-circle me-1"></i>
+                Get this from your Interakt dashboard → Developer Settings.
+              </small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Templates -->
+      <section class="gf-section">
+        <div class="gf-section-head">
+          <div class="gf-section-icon">
+            <i class="bi bi-chat-square-text"></i>
+          </div>
+          <div>
+            <h2 class="gf-section-title">WhatsApp Templates</h2>
+            <p class="gf-section-desc">
+              Configure the template names used for each member communication scenario.
+            </p>
+          </div>
+        </div>
+
+        <div class="row g-3">
+
+          <div class="col-12 col-md-6">
+            <div class="gf-field-card">
+              <label class="gf-label">Expiring Soon Template</label>
+              <input type="text"
+                     name="wa_template_expiring_soon"
+                     class="form-control"
+                     placeholder="membership_expiring_soon"
+                     value="{{ gym.wa_template_expiring_soon }}">
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="gf-field-card">
+              <label class="gf-label">Expiring Today Template</label>
+              <input type="text"
+                     name="wa_template_expires_today"
+                     class="form-control"
+                     placeholder="membership_expires_today"
+                     value="{{ gym.wa_template_expires_today }}">
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="gf-field-card">
+              <label class="gf-label">Expired Template</label>
+              <input type="text"
+                     name="wa_template_expired"
+                     class="form-control"
+                     placeholder="membership_expired"
+                     value="{{ gym.wa_template_expired }}">
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="gf-field-card">
+              <label class="gf-label">Birthday Template</label>
+              <input type="text"
+                     name="wa_template_birthday"
+                     class="form-control"
+                     placeholder="membership_expired"
+                     value="{{ gym.wa_template_birthday }}">
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="gf-field-card">
+              <label class="gf-label">Birthday On Template</label>
+              <input type="text"
+                     name="wa_template_birthday_today"
+                     class="form-control"
+                     value="{{ gym.wa_template_birthday_today }}">
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Reminder & Archive -->
+      <section class="gf-section">
+        <div class="gf-section-head">
+          <div class="gf-section-icon yellow">
+            <i class="bi bi-calendar2-check"></i>
+          </div>
+          <div>
+            <h2 class="gf-section-title">Reminder & Auto Archive Settings</h2>
+            <p class="gf-section-desc">
+              Define when reminders are sent and how long expired records remain before archiving.
+            </p>
+          </div>
+        </div>
+
+        <div class="row g-3">
+
+          <div class="col-12 col-md-6 col-xl-3">
+            <div class="gf-field-card">
+              <label class="gf-label">Reminder Days Before Expiry</label>
+              <input type="number"
+                     name="expiry_reminder_days_before"
+                     class="form-control"
+                     value="{{ gym.expiry_reminder_days_before|default:7 }}">
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-xl-3">
+            <div class="gf-field-card">
+              <label class="gf-label">Auto Archive After (Days)</label>
+              <input type="number"
+                     name="Auto_archive_In"
+                     class="form-control"
+                     value="{{ gym.Auto_archive_In|default:30 }}">
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-xl-3">
+            <div class="gf-field-card d-flex align-items-center h-100">
+              <div class="form-check form-switch m-0">
+                <input class="form-check-input"
+                       type="checkbox"
+                       name="Auto_archive_enable"
+                       id="Auto_archive_enable"
+                       {% if gym.Auto_archive_enable %}checked{% endif %}>
+                <label class="form-check-label fw-semibold small ms-1" for="Auto_archive_enable">
+                  Enable Auto Archive
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 col-xl-3">
+            <div class="gf-field-card">
+              <label class="gf-label">Birthday Reminder Before</label>
+              <input type="number"
+                     name="birthday_reminder_days_before"
+                     class="form-control"
+                     placeholder="Days before birthday"
+                     value="{{ gym.birthday_reminder_days_before }}">
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Save -->
+      <div class="gf-save-bar">
+        <div class="gf-save-note">
+          <i class="bi bi-shield-check me-1"></i>
+          Review your automation and template settings before saving.
+        </div>
+
+        <button class="btn btn-primary gf-save-btn" type="submit">
+          <i class="bi bi-check2-circle me-1"></i>
+          Save WhatsApp Settings
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+
+  {% else %}
+
+  <div class="gf-card gf-locked">
+    <div class="gf-locked-icon">
+      <i class="bi bi-lock"></i>
+    </div>
+    <div class="fw-bold text-dark">WhatsApp Automation</div>
+    <div class="small text-muted mt-1">
+      This configuration is available for the Pro subscription.
+    </div>
+  </div>
+
+  {% endif %}
+
+</div>
+
+<script>
+  $(document).ready(function () {
+    setTimeout(function () {
+      $(".alert").slideUp("slow", function () {
+        $(this).alert('close');
+      });
+    }, 3000);
+  });
+</script>
+
+{% endblock %}

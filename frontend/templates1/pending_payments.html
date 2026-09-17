@@ -1,0 +1,1004 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/modal_card.css' %}">
+
+<style>
+:root{
+  --gf-primary:#2f6fed;--gf-primary-dark:#245bd0;--gf-primary-soft:#edf4ff;
+  --gf-page:#f4f7fb;--gf-border:#e4e9f2;--gf-text:#172033;--gf-muted:#7d8aa5;
+  --gf-danger:#d44949;--gf-danger-soft:#fff0f0;--gf-success:#16845b;--gf-success-soft:#ebf8f2;
+  --gf-warning:#b27b00;--gf-warning-soft:#fff6dc;--gf-shadow:0 8px 24px rgba(28,48,86,.07);--gf-radius:18px
+}
+.pending-payments-page{background:var(--gf-page);color:var(--gf-text);padding:22px 18px 34px;min-height:calc(100vh - 70px)}
+.pending-payments-page .page-header,.pending-payments-page .filter-card,.pending-payments-page .members-card{
+  background:#fff;border:1px solid var(--gf-border);border-radius:var(--gf-radius);box-shadow:var(--gf-shadow)
+}
+.pending-payments-page .page-header{padding:22px 24px;margin-bottom:18px}
+.pending-payments-page .eyebrow{display:flex;align-items:center;gap:9px;color:var(--gf-primary);font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
+.pending-payments-page .eyebrow i,.pending-payments-page .section-icon{
+  width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;background:var(--gf-primary-soft);color:var(--gf-primary);border-radius:10px
+}
+.pending-payments-page .page-title{margin:0;font-size:24px;font-weight:750;letter-spacing:-.02em}
+.pending-payments-page .page-subtitle{margin:4px 0 0;color:var(--gf-muted);font-size:14px}
+.pending-payments-page .total-box{display:flex;align-items:center;gap:12px;padding-left:22px;border-left:1px solid var(--gf-border);min-width:205px}
+.pending-payments-page .total-icon{width:42px;height:42px;border-radius:12px;background:var(--gf-danger-soft);color:var(--gf-danger);display:flex;align-items:center;justify-content:center;font-size:18px}
+.pending-payments-page .total-label{font-size:10px;color:var(--gf-muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.pending-payments-page .total-value{font-size:21px;font-weight:800;color:var(--gf-danger);line-height:1.2;margin-top:3px}
+.pending-payments-page .filter-card{padding:20px;margin-bottom:18px}
+.pending-payments-page .section-heading{display:flex;align-items:center;gap:10px;margin-bottom:17px}
+.pending-payments-page .section-heading h6{margin:0;font-weight:750;font-size:15px}
+.pending-payments-page .section-heading p{margin:2px 0 0;color:var(--gf-muted);font-size:12px}
+.pending-payments-page .form-label{display:block;color:#8793a9;font-size:12px;font-weight:650;margin-bottom:7px}
+.pending-payments-page .form-control,.pending-payments-page .form-select{min-height:44px;border:1px solid #dfe5ef;border-radius:11px;color:#27334a;background:#fff;box-shadow:none}
+.pending-payments-page .form-control:focus,.pending-payments-page .form-select:focus{border-color:#8db2ff;box-shadow:0 0 0 3px rgba(47,111,237,.10)}
+.pending-payments-page .form-control::placeholder{color:#aeb8ca}
+.pending-payments-page .btn-primary{background:var(--gf-primary);border-color:var(--gf-primary);border-radius:11px;font-weight:650;padding:10px 16px}
+.pending-payments-page .btn-primary:hover{background:var(--gf-primary-dark);border-color:var(--gf-primary-dark)}
+.pending-payments-page .reset-btn{border-radius:11px;padding:10px 16px;font-weight:600;border-color:#dce4ef}
+.pending-payments-page .members-card{overflow:hidden}
+.pending-payments-page .members-card-header{padding:18px 20px;border-bottom:1px solid var(--gf-border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pending-payments-page .members-card-header h6{margin:0;font-weight:750;font-size:15px}
+.pending-payments-page .directory-note{display:block;color:var(--gf-muted);font-size:12px;margin-top:3px}
+.pending-payments-page .pending-chip{padding:7px 10px;border-radius:999px;background:var(--gf-danger-soft);color:var(--gf-danger);font-size:11px;font-weight:750;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.pending-payments-page .pending-chip:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pending-payments-page .table-wrap{overflow-x:auto}
+.pending-payments-page table{margin:0!important}
+.pending-payments-page thead th{background:#f8faff;color:#8793a9!important;border-bottom:1px solid var(--gf-border);font-size:11px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;padding:14px 16px!important}
+.pending-payments-page tbody td{border-color:#edf1f6;color:#344057;font-size:13px;padding:14px 16px!important;vertical-align:middle}
+.pending-payments-page tbody tr:hover{background:#fbfcff}
+.pending-payments-page .member-name{color:#1d2940;font-weight:700;line-height:1.2}
+.pending-payments-page .member-id{display:block;color:var(--gf-muted);font-size:11px;margin-top:3px}
+.pending-payments-page .member-avatar{width:42px;height:42px;flex:0 0 42px;border-radius:12px!important;border:0!important;background:var(--gf-primary-soft)!important;color:var(--gf-primary);font-weight:750}
+.pending-payments-page .money-plan{font-weight:700;color:#3d4960}
+.pending-payments-page .money-paid{font-weight:750;color:var(--gf-success)}
+.pending-payments-page .money-pending{font-weight:800;color:var(--gf-danger)}
+.pending-payments-page .action-btn{width:35px;height:35px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;background:#fff;border:1px solid #e1e7f0;color:#63708a}
+.pending-payments-page .action-btn:hover{border-color:#b9cdf5;color:var(--gf-primary);background:var(--gf-primary-soft)}
+.pending-payments-page .mobile-member-card{background:#fff;border:1px solid var(--gf-border);border-radius:16px;box-shadow:var(--gf-shadow)}
+.pending-payments-page .mobile-detail{color:#69758d;font-size:12px;line-height:1.9}
+.pending-payments-page .mobile-detail strong{color:#344057}
+.pending-payments-page .amount-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:#f8faff;border:1px solid #edf1f6;border-radius:12px;padding:10px;margin-top:10px}
+.pending-payments-page .amount-strip .label{display:block;color:var(--gf-muted);font-size:10px}
+.pending-payments-page .amount-strip .value{display:block;font-weight:750;font-size:13px;margin-top:2px}
+.pending-payments-page .mobile-actions{display:grid!important;grid-template-columns:repeat(4,1fr);gap:8px}
+.pending-payments-page .mobile-actions .btn{min-height:48px;border:1px solid #e1e7f0;border-radius:11px!important;color:#59677f;background:#fff;font-weight:650}
+.pending-payments-page .mobile-actions .btn:hover{background:var(--gf-primary-soft);border-color:#b9cdf5}
+.pending-payments-page .empty-state{padding:48px!important;text-align:center;color:var(--gf-muted)}
+.pending-payments-page #pageLoader{z-index:9999}
+.modal-content{border:0;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(20,36,70,.18)}
+.modal-header{border-bottom:1px solid #edf1f6;padding:18px 22px}.modal-footer{border-top:1px solid #edf1f6;padding:14px 22px}.modal-body{padding:22px}
+@media(max-width:767.98px){
+  .pending-payments-page{padding:14px 10px 26px}
+  .pending-payments-page .page-header{padding:18px}
+  .pending-payments-page .page-title{font-size:20px}
+  .pending-payments-page .total-box{border-left:0;border-top:1px solid var(--gf-border);padding:14px 0 0;margin-top:15px;min-width:0}
+  .pending-payments-page .filter-card{padding:16px}
+  .pending-payments-page .mobile-actions{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+
+
+<style>
+  /* Premium modal look */
+  .pm-modal .modal-content {
+    border: 0;
+    border-radius: 18px;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, .18);
+  }
+
+  .pm-modal .modal-header {
+    border-bottom: 1px solid #eef1f5;
+    padding: 18px 22px;
+  }
+
+  .pm-modal .modal-title {
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .pm-modal .modal-body {
+    padding: 18px 22px;
+  }
+
+  .pm-modal .modal-footer {
+    border-top: 1px solid #eef1f5;
+    padding: 14px 22px;
+  }
+
+  /* Member header */
+  .pm-member {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid #eef1f5;
+    border-radius: 14px;
+    background: #fbfcff;
+  }
+
+  .pm-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f3f5;
+    border: 1px solid #e6e9ef;
+    font-weight: 700;
+  }
+
+  .pm-member .name {
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .pm-member .phone {
+    font-size: 13px;
+    color: #6c757d;
+  }
+
+  /* Pending card */
+  .pm-summary {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .pm-card {
+    flex: 1;
+    border: 1px solid #eef1f5;
+    border-radius: 14px;
+    padding: 12px 14px;
+    background: #fff;
+  }
+
+  .pm-card .label {
+    font-size: 12px;
+    color: #6c757d;
+  }
+
+  .pm-card .value {
+    font-weight: 700;
+    margin-top: 4px;
+  }
+
+  .pm-pending {
+    border: 1px solid rgba(220, 53, 69, .15);
+    background: rgba(220, 53, 69, .06);
+  }
+
+  .pm-pending .value {
+    color: #dc3545;
+    font-size: 20px;
+    letter-spacing: .2px;
+  }
+
+  /* Inputs */
+  .pm-modal .form-label {
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .pm-modal .form-control,
+  .pm-modal .form-select {
+    border-radius: 12px;
+    padding: 10px 12px;
+    border-color: #e6e9ef;
+  }
+
+  .pm-modal .form-control:focus,
+  .pm-modal .form-select:focus {
+    box-shadow: 0 0 0 .2rem rgba(13, 110, 253, .12);
+  }
+
+  /* Error */
+  .pm-error {
+    background: rgba(220, 53, 69, .06);
+    border: 1px solid rgba(220, 53, 69, .15);
+    color: #dc3545;
+    border-radius: 12px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  /* Button */
+  .pm-modal #pm_save_btn {
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-weight: 700;
+  }
+  .modal {
+    z-index: 1060 !important;
+  }
+  
+  .modal-backdrop {
+    z-index: 1055 !important;
+  }
+  
+  .floating-menu {
+    z-index: 1050 !important; /* LOWER than modal */
+  }
+</style>
+
+
+
+
+<div class="pending-payments-page container-fluid">
+  <div id="pageLoader"
+       style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,.72);
+              display:none;align-items:center;justify-content:center;">
+    <div class="text-center">
+      <div class="spinner-border text-primary"></div>
+      <div class="mt-2 small text-muted">Loading...</div>
+    </div>
+  </div>
+
+  <div class="page-header">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+      <div>
+        <div class="eyebrow"><i class="bi bi-wallet2"></i> Payment Attention</div>
+        <h1 class="page-title">Pending Payments</h1>
+        <p class="page-subtitle">Members with an outstanding balance on their membership.</p>
+      </div>
+      <div class="total-box">
+        <div class="total-icon"><i class="bi bi-cash-stack"></i></div>
+        <div>
+          <div class="total-label">Total Pending Amount</div>
+          <div class="total-value">₹ <span id="totalPendingTops">{{ total_pending }}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-card">
+    <div class="section-heading">
+      <span class="section-icon"><i class="bi bi-funnel-fill"></i></span>
+      <div>
+        <h6>Search &amp; Filter</h6>
+        <p>Find outstanding payments by member or branch.</p>
+      </div>
+    </div>
+    <form method="get">
+      <div class="row g-3 align-items-end">
+        <div class="col-12 col-lg-5">
+          <label class="form-label">Search Member</label>
+          <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search name or phone">
+        </div>
+        <div class="col-12 col-lg-4">
+          <label class="form-label">Branch</label>
+          <select name="branch" class="form-select">
+            <option value="">All Branches</option>
+            {% for b in branches %}
+              <option value="{{ b.id }}" {% if branch_id == b.id|stringformat:"s" %}selected{% endif %}>{{ b.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-lg-3 d-flex justify-content-end gap-2">
+          <a href="{% url 'pending_payments' %}" class="btn btn-outline-secondary reset-btn w-100">Reset</a>
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-search me-1"></i> Filter
+            <span id="filterLoader" class="d-none"><span class="spinner-border spinner-border-sm ms-2"></span></span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Table Section -->
+  <div class="members-card d-none d-md-block">
+    <div class="members-card-header">
+      <div>
+        <h6><i class="bi bi-receipt-cutoff me-2 text-primary"></i>Pending Payment Directory</h6>
+        <span class="directory-note">Members who still have an outstanding balance.</span>
+      </div>
+      <span class="pending-chip">Collection Required</span>
+    </div>
+    <div class="table-wrap">
+      <table class="table table-hover align-middle mb-0" id="pendingTable">
+              <thead class="table">
+                <tr>
+                  <th class="px-3">#</th>
+                  <th>Member</th>
+                  <th>Branch</th>
+                  <th>Plan</th>
+                  <th>Plan Amount</th>
+                  <th>Paid</th>
+                  <th>Pending</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {% for r in pending_list %}
+                <tr>
+                  <td class="px-3">{{ forloop.counter }}</td>
+
+                  <td>
+  <div class="d-flex align-items-center gap-3">
+    {% if r.photo %}
+    <img src="{{ r.photo }}" width="42" height="42" class="member-avatar" style="object-fit:cover;">
+    {% else %}
+    <div class="member-avatar d-flex align-items-center justify-content-center">{{ r.name|slice:":1"|upper }}</div>
+    {% endif %}
+    <div>
+      <div class="member-name">{{ r.name }}</div>
+      <span class="member-id">ID: {{ r.admission }}</span>
+      <span class="member-id">{{ r.phone }}</span>
+    </div>
+  </div>
+</td>
+
+                  <td>{{ r.branch }}</td>
+                  <td>{{ r.plan }}</td>
+
+                  <td class="money-plan">₹{{ r.plan_price }}</td>
+                  <td class="money-paid">₹{{ r.paid }}</td>
+                  <td class="money-pending">₹{{ r.balance }}</td>
+
+                  <td class="text-center py-3">
+                    <div class="dropdown action-dropdown">
+                      <button class="btn  btn-sm "
+                              type="button"
+                              data-bs-toggle="dropdown"
+                              aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                      </button>
+                  
+                      <ul class="dropdown-menu shadow-sm action-dropdown-menu">
+                        <li>
+                          <a class="dropdown-item"
+                             href="#"
+                             onclick="openMemberDetails('{{ r.member_id }}')">
+                            <i class="bi bi-eye me-2 text-primary"></i> View
+                          </a>
+                        </li>
+                  
+                        <li>
+                          <a class="dropdown-item"
+                             target="_blank"
+                             href="https://wa.me/91{{ r.phone }}?text=Hello%20{{ r.name }}%20👋%0A%0AThis%20is%20a%20reminder%20that%20₹{{ r.balance }}%20is%20pending%20for%20your%20membership%20plan.%0AKindly%20make%20the%20payment%20at%20the%20earliest.%20Thank%20you%20💪">
+                            <i class="bi bi-whatsapp me-2 text-success"></i> WhatsApp
+                          </a>
+                        </li>
+                  
+                        <li>
+                          <a class="dropdown-item"
+                             target="_blank"
+                             href="tel:+91{{ r.phone }}">
+                            <i class="bi bi-telephone me-2 text-primary"></i> Call
+                          </a>
+                        </li>
+                  
+                        <li>
+                          <a class="dropdown-item collect-btn"
+                             href="#"
+                             data-member-id="{{ r.member_id }}">
+                            <i class="bi bi-arrow-repeat me-2 text-success"></i> Collect Payment
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+
+                </tr>
+
+                {% empty %}
+                <tr>
+                  <td colspan="8" class="empty-state">
+                    <i class="bi bi-check-circle fs-4"></i>
+                    <div>No pending payments 🎉</div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+
+            </table>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal fade pm-modal" id="collectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+      <div class="modal-content">
+        <!-- Header -->
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <span class="d-inline-flex align-items-center justify-content-center rounded-circle"
+              style="width:34px;height:34px;background:rgba(13,110,253,.10);">
+              <i class="bi bi-cash-coin text-primary"></i>
+            </span>
+            Collect Pending Payment
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+  
+        <!-- Body -->
+        <div class="modal-body">
+          <input type="hidden" id="pm_member_id">
+  
+          <!-- Member info (premium card) -->
+          <div class="pm-member mb-3">
+            <div class="pm-avatar" id="pm_avatar">M</div>
+            <div>
+              <div class="name" id="pm_member_name">-</div>
+              <div class="phone" id="pm_member_phone">-</div>
+            </div>
+          </div>
+  
+          <!-- Plan + dates + pending -->
+          <div class="pm-card mb-3">
+            <div class="label">Plan</div>
+            <div class="value" id="pm_plan_name">-</div>
+  
+            <div class="row g-2 mt-2">
+              <div class="col-6">
+                <div class="label">Start</div>
+                <div class="value" id="pm_start_date">-</div>
+              </div>
+              <div class="col-6">
+                <div class="label">Expiry</div>
+                <div class="value" id="pm_expiry_date">-</div>
+              </div>
+            </div>
+          </div>
+  
+          <div class="pm-card pm-pending mb-3">
+            <div class="label">Pending Amount</div>
+            <div class="value">₹<span id="pm_balance">0.00</span></div>
+          </div>
+  
+          <!-- Error -->
+          <div class="pm-error mb-3 d-none" id="pm_error"></div>
+  
+          <!-- Inputs -->
+          <div class="row g-2">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Amount</label>
+              <input type="number" class="form-control" id="pm_amount" min="1" step="0.01" placeholder="Enter amount">
+            </div>
+  
+            <div class="col-12 col-md-6">
+              <label class="form-label">Payment Mode</label>
+              <select class="form-select" id="pm_mode">
+                <option value="cash">Cash</option>
+                <option value="upi">UPI</option>
+              </select>
+            </div>
+          </div>
+  
+          <div class="text-muted small mt-2">
+            Tip: enter only the balance amount to close pending.
+          </div>
+        </div>
+  
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="pm_save_btn">
+            <i class="bi bi-check2-circle me-1"></i> Save Payment
+          </button>
+        </div>
+  
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE VIEW -->
+<div class="d-block d-md-none">
+
+  {% for r in pending_list %}
+
+  <div class="mobile-member-card mb-3 pending-card"
+       data-name="{{ r.name|lower }}"
+       data-phone="{{ r.phone }}"
+       data-branch="{{ r.branch }}">
+    <div class="card-body p-3">
+
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center">
+
+        <!-- Profile -->
+        <div class="d-flex align-items-center gap-2">
+          {% if r.photo %}
+          <img src="{{ r.photo }}" width="50" height="50"
+               class="rounded-circle border"
+               style="object-fit:cover;">
+          {% else %}
+          <div class="rounded-circle border d-flex align-items-center justify-content-center"
+               style="width:50px;height:50px;background:#f1f3f5;font-weight:600;">
+            {{ r.name|slice:":1"|upper }}
+          </div>
+          {% endif %}
+
+          <div>
+            <div class="fw-semibold" style="font-size:15px;">
+              {{ r.name }}
+            </div>
+            <small class="text-muted">
+              ID: {{ r.admission }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Pending Amount Highlight -->
+        <div class="text-end">
+          <div class="fw-bold text-danger">
+            ₹{{ r.balance }}
+          </div>
+          <small class="text-muted">Pending</small>
+        </div>
+
+      </div>
+
+      <hr class="my-2">
+
+      <!-- Details -->
+      <div class="mobile-detail">
+        <div><strong class="text-dark">📞</strong> {{ r.phone }}</div>
+        <div><strong class="text-dark">🏢</strong> {{ r.branch }}</div>
+        <div><strong class="text-dark">📦</strong> {{ r.plan }}</div>
+      </div>
+
+      <!-- Amount Breakdown -->
+      <div class="amount-strip">
+        <div><span class="label">Plan Amount</span><span class="value">₹{{ r.plan_price }}</span></div>
+        <div><span class="label">Paid</span><span class="value text-success">₹{{ r.paid }}</span></div>
+        <div><span class="label">Pending</span><span class="value text-danger pending-amount">₹{{ r.balance }}</span></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="mt-3 mobile-actions">
+
+        <!-- View -->
+        <button class="btn btn-light flex-fill text-center"
+                onclick="openMemberDetails('{{ r.member_id }}')"
+                style="border-radius:10px;">
+          <i class="bi bi-eye fs-5"></i>
+          <div style="font-size:11px;">View</div>
+        </button>
+
+        <!-- WhatsApp -->
+        <a class="btn btn-light flex-fill text-center"
+           target="_blank"
+           href="https://wa.me/91{{ r.phone }}?text=Hello%20{{ r.name }}%20👋%0A%0A₹{{ r.balance }}%20is%20pending.%20Please%20pay%20soon%20💪"
+           style="border-radius:10px;">
+          <i class="bi bi-whatsapp fs-5 text-success"></i>
+          <div style="font-size:11px;">WhatsApp</div>
+        </a>
+
+        <!-- Call -->
+        <a class="btn btn-light flex-fill text-center"
+           href="tel:+91{{ r.phone }}"
+           style="border-radius:10px;">
+          <i class="bi bi-telephone fs-5 text-primary"></i>
+          <div style="font-size:11px;">Call</div>
+        </a>
+
+        <!-- Collect -->
+        <button class="btn btn-light flex-fill text-center collect-btn"
+                data-member-id="{{ r.member_id }}"
+                style="border-radius:10px;">
+          <i class="bi bi-cash-stack fs-5 text-warning"></i>
+          <div style="font-size:11px;">Collect</div>
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+  {% empty %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-check-circle fs-3"></i>
+    <div class="mt-2">No pending payments 🎉</div>
+  </div>
+  {% endfor %}
+
+</div>
+
+</div>
+
+
+
+
+<!-- Member Details Modal -->
+<div class="modal fade" id="memberDetailsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+
+          <div class="modal-header">
+              <h5 class="modal-title">Member Details</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+              <!-- Member Summary -->
+              <div class="row g-3 shadow-sm">
+                  <div class="col-md-6 ">
+                      <div class="border rounded p-3">
+                          <div><b>Name:</b> <span id="md_name">-</span></div>
+                          <div><b>Phone:</b> <span id="md_phone">-</span></div>
+                          <div><b>Status:</b> <span id="md_status" class="badge rounded-pill bg-success">-</span></div>
+                          <div><b>Join Date:</b> <span id="md_join_date">-</span></div>
+                      </div>
+                  </div>
+
+                  <div class="col-md-6 ">
+                      <div class="border rounded p-3">
+                          <div><b>Gym:</b> <span id="md_gym">-</span></div>
+                          <div><b>Branch:</b> <span id="md_branch">-</span></div>
+                          <div><b>Plan:</b> <span id="md_plan">-</span></div>
+                          <div><b>Plan Valid:</b> <span id="md_validity">-</span></div>
+                      </div>
+                  </div>
+              </div>
+
+              <hr>
+
+              <!-- Payment Summary -->
+              <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                  <h6 class="mb-0">Payment History</h6>
+                  <div class="text-end">
+                    <span class="me-3"><b>Total Paid:</b> ₹<span id="md_total_paid">0</span></span>
+                    <span class="me-3"><b>Total Discount:</b> ₹<span id="md_total_discount">0</span></span>
+                    <span class="me-3"><b>Total Final:</b> ₹<span id="md_total_final">0</span></span>
+                    <span class="me-3"><b>Pending:</b> ₹<span id="md_total_pending">0</span></span>
+                    <span><b>Last Payment:</b> <span id="md_last_payment">-</span></span>
+                  </div>
+                </div>
+
+              <!-- Payment Table -->
+              <div class="table-responsive">
+                <table class="table table-sm table-bordered align-middle">
+                  <thead>
+                    <tr>
+                      <th style="width:50px;">#</th>
+                      <th>Invoice</th>
+                      <th>Payment Date</th>
+                      <th>Plan</th>
+                      <th>Plan Price</th>
+                      <th>Discount</th>
+                      <th>Final</th>
+                      <th>Paid</th>
+                      <th>Mode</th>
+                      <th>Reason</th>
+                      <th>Given By</th>
+                      <th>Coverage Start</th>
+                      <th>Coverage End</th>
+                    </tr>
+                  </thead>
+                  <tbody id="md_payments_tbody">
+                    <tr>
+                      <td colspan="13" class="text-center">No payments</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+          </div>
+
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+
+      </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+<!-- WhatsApp Modal -->
+<!-- WhatsApp Modal -->
+<div class="modal fade" id="whatsappModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title">Send Receipt</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body text-center">
+        <p class="mb-3">
+          Receipt is ready ✅ <br>
+          Click below to preview the invoice.
+        </p>
+
+        <a href="#" id="invoicePdfBtn" target="_blank" class="btn btn-primary">
+          <i class="bi bi-filetype-pdf me-1"></i> View PDF
+        </a>
+      </div>
+
+      <div class="modal-footer justify-content-between">
+        <a href="#" id="whatsappOpenBtn" target="_blank" class="btn btn-success">
+          <i class="bi bi-whatsapp me-1"></i> Open WhatsApp
+        </a>
+
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          Later
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+
+  // ================= FORM LOADER =================
+  document.querySelector("form").addEventListener("submit", function () {
+    document.getElementById("pageLoader").style.display = "flex";
+  });
+  
+  // ================= DROPDOWN FIX =================
+  document.addEventListener("DOMContentLoaded", function () {
+
+    document.querySelectorAll(".action-dropdown").forEach(function (dropdown) {
+  
+      const button = dropdown.querySelector('[data-bs-toggle="dropdown"]');
+      const menu = dropdown.querySelector(".action-dropdown-menu");
+  
+      if (!button || !menu) return;
+  
+      dropdown.addEventListener("show.bs.dropdown", function () {
+  
+        const rect = button.getBoundingClientRect();
+  
+        let top = rect.bottom + window.scrollY + 4;
+        let left = rect.right - menu.offsetWidth;
+  
+        if (left < 8) left = 8;
+  
+        // prevent overflow bottom
+        if (top + menu.offsetHeight > window.innerHeight + window.scrollY) {
+          top = rect.top + window.scrollY - menu.offsetHeight;
+        }
+  
+        menu.style.position = "absolute";
+        menu.style.top = `${top}px`;
+        menu.style.left = `${left}px`;
+        menu.style.zIndex = "1050";
+      });
+  
+      dropdown.addEventListener("hide.bs.dropdown", function () {
+        menu.style.top = "";
+        menu.style.left = "";
+      });
+  
+    });
+  
+  });
+  
+  // ================= UTIL FUNCTIONS =================
+  function safeText(v) {
+    return (v === null || v === undefined || v === "") ? "-" : v;
+  }
+  
+  function parseMoney(val) {
+    if (!val) return 0;
+    return parseFloat(String(val).replace(/[₹,\s]/g, "")) || 0;
+  }
+  
+  function initials(name) {
+    if (!name) return "M";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  
+  function formatMoney(value) {
+    const num = parseFloat(value || 0);
+    return num.toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+  
+  function setStatusBadge(label) {
+    const $el = $("#md_status");
+    $el.text(safeText(label));
+    $el.removeClass("bg-success bg-danger bg-warning bg-secondary text-dark");
+  
+    const l = String(label || "").toLowerCase();
+    if (l.includes("active")) $el.addClass("bg-success");
+    else if (l.includes("expired")) $el.addClass("bg-danger");
+    else if (l.includes("expir")) $el.addClass("bg-warning text-dark");
+    else $el.addClass("bg-secondary");
+  }
+  
+  // ================= MEMBER DETAILS =================
+  function openMemberDetails(memberId) {
+    $.ajax({
+      url: `/members/${memberId}/full-details/`,
+      type: "GET",
+      dataType: "json",
+      success: function (data) {
+  
+        $("#md_name").text(safeText(data.member.name));
+        $("#md_phone").text(safeText(data.member.phone));
+        setStatusBadge(data.member.status_label);
+        $("#md_join_date").text(safeText(data.member.join_date));
+  
+        $("#md_gym").text(safeText(data.member.gym_name));
+        $("#md_branch").text(safeText(data.member.branch_name));
+  
+        $("#md_plan").text(
+          data.member.plan_name
+            ? `${data.member.plan_name} (₹${safeText(data.member.plan_price)})`
+            : "-"
+        );
+  
+        $("#md_validity").text(
+          `${safeText(data.member.start_date)} → ${safeText(data.member.expiry_date)}`
+        );
+  
+        $("#md_total_paid").text(formatMoney(data.summary.total_paid));
+        $("#md_total_discount").text(formatMoney(data.summary.total_discount));
+        $("#md_total_final").text(formatMoney(data.summary.total_final_amount));
+        $("#md_total_pending").text(formatMoney(data.summary.total_pending));
+        $("#md_last_payment").text(safeText(data.summary.last_payment_date));
+  
+        const $tbody = $("#md_payments_tbody").empty();
+  
+        if (!data.payments || data.payments.length === 0) {
+          $tbody.html(`<tr><td colspan="13" class="text-center text-muted">No payments</td></tr>`);
+        } else {
+          $.each(data.payments, function (idx, p) {
+            $tbody.append(`
+              <tr>
+                <td>${idx + 1}</td>
+                <td>${safeText(p.invoice_no)}</td>
+                <td>${safeText(p.payment_date)}</td>
+                <td>${safeText(p.plan_name)}</td>
+                <td>₹${formatMoney(p.plan_price)}</td>
+                <td class="text-danger fw-semibold">₹${formatMoney(p.discount_amount)}</td>
+                <td class="fw-semibold">₹${formatMoney(p.final_amount)}</td>
+                <td class="text-success fw-semibold">₹${formatMoney(p.amount)}</td>
+                <td>${safeText(p.payment_mode_label)}</td>
+                <td>${safeText(p.discount_reason || "-")}</td>
+                <td>${safeText(p.created_by_name || "-")}</td>
+                <td>${safeText(p.coverage_start)}</td>
+                <td>${safeText(p.coverage_end)}</td>
+              </tr>
+            `);
+          });
+        }
+  
+        bootstrap.Modal.getOrCreateInstance(
+          document.getElementById("memberDetailsModal")
+        ).show();
+      },
+      error: function (xhr) {
+        alert(xhr.responseJSON?.error || "Failed to load member details");
+      }
+    });
+  }
+  
+  window.openMemberDetails = openMemberDetails;
+  
+  // ================= MAIN =================
+  $(function () {
+  
+    const collectModal = new bootstrap.Modal(document.getElementById("collectModal"));
+  
+    function showError(msg) {
+      $("#pm_error").text(msg).removeClass("d-none");
+    }
+  
+    function clearError() {
+      $("#pm_error").addClass("d-none").text("");
+    }
+  
+    // ===== OPEN MODAL =====
+    $(document).on("click", ".collect-btn", function (e) {
+      e.preventDefault();
+    
+      const memberId = $(this).data("member-id");
+      clearError();
+    
+      // ✅ Proper Bootstrap way to close dropdown
+      document.querySelectorAll('.dropdown-toggle').forEach(btn => {
+        const instance = bootstrap.Dropdown.getInstance(btn);
+        if (instance) instance.hide();
+      });
+    
+      $.get(`/pending-payment/${memberId}/data/`, function (res) {
+    
+        if (!res.success) {
+          alert(res.error || "Failed to load data");
+          return;
+        }
+    
+        $("#pm_member_id").val(res.member.id);
+        $("#pm_member_name").text(res.member.name);
+        $("#pm_member_phone").text(res.member.phone);
+        $("#pm_avatar").text(initials(res.member.name));
+        $("#pm_plan_name").text(`${res.plan.name} (₹${res.plan.price})`);
+        $("#pm_start_date").text(res.plan.start_date || "-");
+        $("#pm_expiry_date").text(res.plan.expiry_date || "-");
+        $("#pm_balance").text(Number(res.payments.balance || 0).toFixed(2));
+        $("#pm_amount").val("").attr("max", res.payments.balance);
+    
+        // ✅ small delay ensures dropdown fully closed
+        setTimeout(() => {
+          collectModal.show();
+        }, 120);
+    
+      });
+    });
+  
+    // ===== SAVE PAYMENT =====
+    $("#pm_save_btn").on("click", function () {
+  
+      clearError();
+  
+      const memberId = $("#pm_member_id").val();
+      const amount = parseFloat($("#pm_amount").val() || 0);
+      const mode = $("#pm_mode").val();
+      const $btn = $(this);
+  
+      if (amount <= 0) {
+        showError("Enter a valid amount.");
+        return;
+      }
+  
+      $btn.prop("disabled", true).html(
+        `<span class="spinner-border spinner-border-sm me-2"></span>Saving...`
+      );
+  
+      $.ajax({
+        url: `/pending-payment/${memberId}/pay/`,
+        type: "POST",
+        data: {
+          amount: amount,
+          payment_mode: mode,
+          csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").first().val()
+        },
+  
+        success: function (res) {
+          if (!res.success) {
+            showError(res.error || "Failed");
+            return;
+          }
+  
+          // ✅ Show loader + reload
+          $("#pageLoader").css("display", "flex");
+  
+          setTimeout(function () {
+            location.reload();
+          }, 700);
+        },
+  
+        error: function (xhr) {
+          showError(xhr.responseJSON?.error || "Payment failed");
+        },
+  
+        complete: function () {
+          $btn.prop("disabled", false).html(
+            `<i class="bi bi-check2-circle me-1"></i> Save Payment`
+          );
+        }
+      });
+    });
+  
+  });
+  
+  // ================= PAGE LOAD =================
+  $(window).on("load", function () {
+    $("#pageLoader").fadeOut(250);
+  });
+  
+  </script>
+
+{% endblock %}

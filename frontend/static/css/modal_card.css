@@ -1,0 +1,130 @@
+
+  /* */
+
+  .md-modal .modal-content{
+    border: 0;
+    border-radius: 18px;
+    box-shadow: 0 18px 60px rgba(0,0,0,.18);
+  }
+  .md-modal .modal-header{
+    border-bottom: 1px solid #eef1f5;
+    padding: 18px 22px;
+  }
+  .md-modal .modal-title{
+    font-weight: 800;
+    font-size: 18px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .md-modal .modal-body{ padding: 18px 22px; }
+  .md-modal .modal-footer{
+    border-top: 1px solid #eef1f5;
+    padding: 14px 22px;
+  }
+
+  /* Member header card */
+  .md-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding: 12px 14px;
+    border: 1px solid #eef1f5;
+    border-radius: 14px;
+    background: #fbfcff;
+    margin-bottom: 14px;
+  }
+  .md-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .md-avatar{
+    width:44px;height:44px;border-radius:50%;
+    background:#f1f3f5;border:1px solid #e6e9ef;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;
+  }
+  .md-name{ font-weight:800; line-height:1.1; }
+  .md-phone{ font-size:13px; color:#6c757d; }
+
+  /* Pills */
+  .md-pill{
+    font-size:12px;
+    font-weight:700;
+    padding:6px 10px;
+    border-radius: 999px;
+    border:1px solid #e6e9ef;
+    background:#fff;
+    white-space:nowrap;
+  }
+
+  /* Info cards */
+  .md-card{
+    border:1px solid #eef1f5;
+    border-radius:14px;
+    padding: 14px;
+    background:#fff;
+    height:100%;
+  }
+  .md-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    padding: 8px 0;
+    border-bottom: 1px dashed #eef1f5;
+  }
+  .md-row:last-child{ border-bottom:0; padding-bottom:0; }
+  .md-row .label{
+    font-size:12px;
+    color:#6c757d;
+    font-weight:700;
+  }
+  .md-row .value{
+    font-weight:700;
+    text-align:right;
+  }
+
+  /* Payment summary bar */
+  .md-summary{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding: 12px 14px;
+    border: 1px solid #eef1f5;
+    border-radius: 14px;
+    background:#fff;
+    margin: 12px 0;
+    flex-wrap:wrap;
+  }
+  .md-summary .title{
+    font-weight:800;
+  }
+  .md-metric{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+  }
+  .md-metric .k{ color:#6c757d; font-weight:700; }
+  .md-metric .v{ font-weight:800; }
+
+  /* Table */
+  .md-modal .table{
+    border-radius: 14px;
+    overflow:hidden;
+    border: 1px solid #eef1f5;
+  }
+  .md-modal thead th{
+    font-size: 12px;
+    color:#6c757d;
+    font-weight:800;
+    background:#fbfcff;
+    border-bottom:1px solid #eef1f5 !important;
+  }
+  .md-modal tbody td{
+    vertical-align: middle;
+  }

@@ -1,0 +1,880 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+/* =========================================================
+   GymFlow Invoices — Professional Finance Layout
+   ========================================================= */
+.gf-invoice-pro {
+    --blue: #2f6fed;
+    --blue-dark: #245bd0;
+    --blue-soft: #edf4ff;
+    --ink: #172033;
+    --muted: #7d8aa5;
+    --border: #e2e8f1;
+    --surface: #ffffff;
+    --page: #f5f7fb;
+    --green: #16845b;
+    --green-soft: #ebf7f1;
+    --red: #d44949;
+    --red-soft: #fff0f0;
+    --shadow: 0 8px 24px rgba(25,45,80,.055);
+    color: var(--ink);
+}
+
+/* Page */
+.gf-invoice-pro .invoice-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+/* Header */
+.gf-invoice-pro .invoice-header {
+    position: relative;
+    overflow: hidden;
+    padding: 21px 23px;
+}
+
+.gf-invoice-pro .invoice-header::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--blue), #78a5ff);
+}
+
+.gf-invoice-pro .brand-icon {
+    width: 47px;
+    height: 47px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    border-radius: 13px;
+    color: var(--blue);
+    background: var(--blue-soft);
+    font-size: 1.15rem;
+}
+
+.gf-invoice-pro .eyebrow {
+    color: var(--blue);
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.gf-invoice-pro .page-title {
+    margin: 3px 0 0;
+    font-size: 1.48rem;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -.025em;
+}
+
+.gf-invoice-pro .page-subtitle {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: .79rem;
+}
+
+.gf-invoice-pro .header-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.gf-invoice-pro .export-btn {
+    min-height: 39px;
+    padding: 0 12px;
+    border-radius: 9px;
+    font-size: .74rem;
+    font-weight: 750;
+}
+
+/* Filter */
+.gf-invoice-pro .filter-card {
+    padding: 18px 20px 19px;
+}
+
+.gf-invoice-pro .section-heading {
+    margin-bottom: 15px;
+}
+
+.gf-invoice-pro .section-title {
+    margin: 0;
+    font-size: .92rem;
+    font-weight: 800;
+}
+
+.gf-invoice-pro .section-subtitle {
+    margin: 3px 0 0;
+    color: var(--muted);
+    font-size: .71rem;
+}
+
+.gf-invoice-pro .heading-icon {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: var(--blue);
+    background: var(--blue-soft);
+}
+
+.gf-invoice-pro .filter-label {
+    display: block;
+    margin: 0 0 6px 1px;
+    color: #65718a;
+    font-size: .65rem;
+    font-weight: 800;
+    letter-spacing: .055em;
+    text-transform: uppercase;
+}
+
+.gf-invoice-pro .form-control,
+.gf-invoice-pro .form-select {
+    min-height: 42px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #fbfcfe;
+    color: var(--ink);
+    font-size: .77rem;
+    box-shadow: none;
+    transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.gf-invoice-pro .form-control:hover,
+.gf-invoice-pro .form-select:hover {
+    background: #fff;
+    border-color: #cbd6e7;
+}
+
+.gf-invoice-pro .form-control:focus,
+.gf-invoice-pro .form-select:focus {
+    background: #fff;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(47,111,237,.09);
+}
+
+.gf-invoice-pro .filter-actions {
+    display: flex;
+    gap: 7px;
+    margin-top: 2px;
+}
+
+.gf-invoice-pro .filter-actions .btn {
+    min-height: 39px;
+    border-radius: 9px;
+    font-size: .72rem;
+    font-weight: 750;
+}
+
+/* Directory */
+.gf-invoice-pro .directory-head {
+    padding: 17px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.gf-invoice-pro .directory-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 30px;
+    padding: 5px 10px;
+    border: 1px solid #dce7fa;
+    border-radius: 999px;
+    color: var(--blue);
+    background: var(--blue-soft);
+    font-size: .65rem;
+    font-weight: 800;
+}
+
+.gf-invoice-pro .table-wrap {
+    overflow-x: auto;
+    padding: 0 9px 9px;
+}
+
+.gf-invoice-pro .invoice-table {
+    width: 100%;
+    min-width: 1120px;
+    margin: 0;
+}
+
+.gf-invoice-pro .invoice-table thead th {
+    padding: 11px 10px;
+    border-bottom: 1px solid var(--border);
+    background: #f8faff;
+    color: #78849b;
+    font-size: .61rem;
+    font-weight: 800;
+    letter-spacing: .055em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.gf-invoice-pro .invoice-table tbody td {
+    padding: 12px 10px;
+    border-color: #edf0f5;
+    color: #3c4960;
+    font-size: .74rem;
+    vertical-align: middle;
+}
+
+.gf-invoice-pro .invoice-table tbody tr {
+    transition: background .16s ease;
+}
+
+.gf-invoice-pro .invoice-table tbody tr:hover {
+    background: #fbfdff;
+}
+
+.gf-invoice-pro .invoice-number {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--blue);
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.gf-invoice-pro .invoice-number:hover {
+    color: var(--blue-dark);
+    text-decoration: underline;
+}
+
+.gf-invoice-pro .invoice-number i {
+    font-size: .68rem;
+}
+
+.gf-invoice-pro .member-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 145px;
+}
+
+.gf-invoice-pro .member-avatar {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 32px;
+    border-radius: 9px;
+    color: var(--blue);
+    background: var(--blue-soft);
+    font-size: .72rem;
+}
+
+.gf-invoice-pro .member-name {
+    color: var(--ink);
+    font-weight: 750;
+    line-height: 1.2;
+}
+
+.gf-invoice-pro .member-phone {
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: .63rem;
+}
+
+.gf-invoice-pro .date-cell {
+    color: #5e6b82;
+    white-space: nowrap;
+}
+
+.gf-invoice-pro .amount {
+    color: #313d53;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.gf-invoice-pro .discount {
+    display: inline-flex;
+    padding: 4px 7px;
+    border-radius: 7px;
+    color: var(--red);
+    background: var(--red-soft);
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.gf-invoice-pro .final-amount {
+    color: var(--ink);
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.gf-invoice-pro .paid-amount {
+    display: inline-flex;
+    padding: 4px 7px;
+    border-radius: 7px;
+    color: var(--green);
+    background: var(--green-soft);
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.gf-invoice-pro .payment-mode {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 26px;
+    padding: 4px 7px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: #56637a;
+    background: #fafbfe;
+    font-size: .65rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.gf-invoice-pro .staff-name {
+    color: #3c4960;
+    font-weight: 700;
+}
+
+.gf-invoice-pro .staff-role {
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: .61rem;
+}
+
+/* Empty */
+.gf-invoice-pro .empty-state {
+    padding: 55px 20px;
+    text-align: center;
+}
+
+.gf-invoice-pro .empty-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    color: #91a0b9;
+    background: #f1f4f9;
+    font-size: 1.1rem;
+}
+
+.gf-invoice-pro .empty-title {
+    color: #45526a;
+    font-size: .81rem;
+    font-weight: 750;
+}
+
+.gf-invoice-pro .empty-text {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: .69rem;
+}
+
+/* Mobile invoice cards */
+.gf-invoice-pro .mobile-directory-head {
+    padding: 2px 2px 9px;
+}
+
+.gf-invoice-pro .mobile-invoice-card {
+    padding: 15px;
+}
+
+.gf-invoice-pro .mobile-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.gf-invoice-pro .mobile-invoice-number {
+    font-size: .87rem;
+    font-weight: 800;
+}
+
+.gf-invoice-pro .mobile-date {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: .65rem;
+}
+
+.gf-invoice-pro .mobile-paid {
+    text-align: right;
+}
+
+.gf-invoice-pro .mobile-paid-label,
+.gf-invoice-pro .mobile-label {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--muted);
+    font-size: .61rem;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.gf-invoice-pro .mobile-paid-value {
+    color: var(--green);
+    font-size: .91rem;
+    font-weight: 800;
+}
+
+.gf-invoice-pro .mobile-member-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 13px 0;
+    padding: 11px;
+    border: 1px solid #edf1f7;
+    border-radius: 11px;
+    background: #f8faff;
+}
+
+.gf-invoice-pro .mobile-value {
+    color: #344158;
+    font-size: .75rem;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+}
+
+.gf-invoice-pro .mobile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 16px;
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    .gf-invoice-pro .invoice-header {
+        padding: 17px;
+    }
+
+    .gf-invoice-pro .page-title {
+        font-size: 1.24rem;
+    }
+
+    .gf-invoice-pro .header-actions {
+        width: 100%;
+    }
+
+    .gf-invoice-pro .export-btn {
+        flex: 1;
+    }
+
+    .gf-invoice-pro .filter-card {
+        padding: 15px;
+    }
+
+    .gf-invoice-pro .directory-head {
+        padding: 15px;
+    }
+
+    .gf-invoice-pro .filter-actions {
+        width: 100%;
+    }
+
+    .gf-invoice-pro .filter-actions .btn {
+        flex: 1;
+    }
+}
+</style>
+
+<div class="gf-invoice-pro">
+  <div class="container-fluid px-3 px-lg-4 py-2 py-md-3">
+
+    <!-- PROFESSIONAL HEADER -->
+    <div class="invoice-card invoice-header mb-3">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+
+        <div class="d-flex align-items-center gap-3">
+          <span class="brand-icon">
+            <i class="bi bi-receipt-cutoff"></i>
+          </span>
+
+          <div>
+            <div class="eyebrow">Finance Management</div>
+            <h1 class="page-title">Invoices</h1>
+            <p class="page-subtitle">
+              Review invoice records, payment details and collection activity.
+            </p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button type="button" class="btn btn-success export-btn" id="btnExportExcel">
+            <i class="bi bi-file-earmark-excel me-1"></i>
+            Export Excel
+          </button>
+
+          <button type="button" class="btn btn-outline-success export-btn" id="btnExportCSV">
+            <i class="bi bi-file-earmark-arrow-down me-1"></i>
+            Export CSV
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SEARCH & FILTER -->
+    <form method="get" class="invoice-card mb-3">
+      <div class="filter-card">
+
+        <div class="section-heading">
+          <div class="d-flex align-items-center gap-2">
+            <span class="heading-icon"><i class="bi bi-funnel"></i></span>
+            <div>
+              <h2 class="section-title">Search &amp; Filter</h2>
+              <p class="section-subtitle">Filter invoices by member, branch, staff or payment date.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 align-items-end">
+
+          <div class="col-12 col-md-4">
+            <label class="filter-label">Search</label>
+            <input type="text" name="q" class="form-control"
+                   value="{{ filters.q }}" placeholder="Name, phone or invoice number">
+          </div>
+
+          <div class="col-12 col-md-2">
+            <label class="filter-label">Branch</label>
+            <select name="branch" class="form-select">
+              <option value="">All Branches</option>
+              {% for b in branches %}
+              <option value="{{ b.id }}" {% if filters.branch == b.id|stringformat:"s" %}selected{% endif %}>
+                {{ b.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-12 col-md-2">
+            <label class="filter-label">Staff</label>
+            <select name="created_by" class="form-select">
+              <option value="">All Staff</option>
+              {% for s in staff %}
+              <option value="{{ s.id }}" {% if filters.created_by == s.id|stringformat:"s" %}selected{% endif %}>
+                {{ s.first_name|default:s.username }} ({{ s.role }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-6 col-md-2">
+            <label class="filter-label">Start Date</label>
+            <input type="date" name="start" class="form-control" value="{{ filters.start }}">
+          </div>
+
+          <div class="col-6 col-md-2">
+            <label class="filter-label">End Date</label>
+            <input type="date" name="end" class="form-control" value="{{ filters.end }}">
+          </div>
+
+          <div class="col-12">
+            <div class="filter-actions">
+              <button class="btn btn-primary px-3" type="submit">
+                <i class="bi bi-funnel me-1"></i>Apply Filters
+              </button>
+
+              <a class="btn btn-light border px-3" href="{% url 'invoices_page' %}">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </form>
+
+    <!-- DESKTOP INVOICE DIRECTORY -->
+    <section class="invoice-card d-none d-md-block">
+      <div class="directory-head">
+        <div class="d-flex justify-content-between align-items-center gap-3">
+          <div>
+            <h2 class="section-title">
+              <i class="bi bi-journal-text text-primary me-2"></i>Invoice Directory
+            </h2>
+            <p class="section-subtitle">
+              Invoice-level payment and collection details.
+            </p>
+          </div>
+
+          <span class="directory-chip">
+            <i class="bi bi-file-earmark-text"></i>
+            Invoice Records
+          </span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table invoice-table table-hover align-middle" id="invoiceTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Invoice No</th>
+              <th>Date</th>
+              <th>Member</th>
+              <th>Branch</th>
+              <th>Plan</th>
+              <th>Plan Price</th>
+              <th>Discount</th>
+              <th>Final</th>
+              <th>Paid</th>
+              <th>Mode</th>
+              <th>Given By</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for r in rows %}
+            <tr>
+              <td class="text-muted">{{ forloop.counter }}</td>
+
+              <td>
+                <a href="{% url 'generate_invoice_pdf' r.invoice_no %}"
+                   target="_blank" class="invoice-number">
+                  <i class="bi bi-file-earmark-pdf"></i>
+                  {{ r.invoice_no }}
+                </a>
+              </td>
+
+              <td class="date-cell">{{ r.payment_date|date:"Y-m-d" }}</td>
+
+              <td>
+                <div class="member-cell">
+                  <span class="member-avatar">
+                    <i class="bi bi-person-fill"></i>
+                  </span>
+                  <div>
+                    <div class="member-name">{{ r.member.name }}</div>
+                    <div class="member-phone">{{ r.member.phone }}</div>
+                  </div>
+                </div>
+              </td>
+
+              <td>{{ r.member.branch.name }}</td>
+              <td class="fw-semibold">{{ r.plan.name }}</td>
+              <td class="amount">₹{{ r.plan_price }}</td>
+
+              <td>
+                <span class="discount">₹{{ r.discount_amount }}</span>
+              </td>
+
+              <td class="final-amount">₹{{ r.final_amount }}</td>
+
+              <td>
+                <span class="paid-amount">₹{{ r.amount }}</span>
+              </td>
+
+              <td>
+                <span class="payment-mode">
+                  <i class="bi bi-wallet2"></i>
+                  {{ r.get_payment_mode_display }}
+                </span>
+              </td>
+
+              <td>
+                {% if r.created_by %}
+                <div class="staff-name">
+                  {{ r.created_by.first_name|default:r.created_by.username }}
+                </div>
+                <div class="staff-role">{{ r.created_by.role }}</div>
+                {% else %}
+                <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+            </tr>
+
+            {% empty %}
+            <tr>
+              <td colspan="12">
+                <div class="empty-state">
+                  <div class="empty-icon"><i class="bi bi-receipt"></i></div>
+                  <div class="empty-title">No invoices found</div>
+                  <div class="empty-text">No invoice records match the selected filters.</div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- MOBILE INVOICE DIRECTORY -->
+    <section class="d-block d-md-none">
+
+      <div class="mobile-directory-head">
+        <h2 class="section-title">
+          <i class="bi bi-journal-text text-primary me-2"></i>Invoice Directory
+        </h2>
+        <p class="section-subtitle">Invoice payment activity</p>
+      </div>
+
+      {% for r in rows %}
+      <article class="invoice-card mobile-invoice-card mb-3">
+
+        <div class="mobile-top">
+          <div>
+            <a href="{% url 'generate_invoice_pdf' r.invoice_no %}"
+               target="_blank" class="invoice-number mobile-invoice-number">
+              <i class="bi bi-file-earmark-pdf"></i>
+              {{ r.invoice_no }}
+            </a>
+            <div class="mobile-date">{{ r.payment_date|date:"Y-m-d" }}</div>
+          </div>
+
+          <div class="mobile-paid">
+            <span class="mobile-paid-label">Paid</span>
+            <span class="mobile-paid-value">₹{{ r.amount }}</span>
+          </div>
+        </div>
+
+        <div class="mobile-member-box">
+          <div>
+            <span class="mobile-label">Member</span>
+            <div class="mobile-value fw-bold">{{ r.member.name }}</div>
+            <div class="member-phone">{{ r.member.phone }}</div>
+          </div>
+
+          <div class="text-end">
+            <span class="mobile-label">Final</span>
+            <div class="mobile-value fw-bold">₹{{ r.final_amount }}</div>
+          </div>
+        </div>
+
+        <div class="mobile-grid">
+          <div>
+            <span class="mobile-label">Branch</span>
+            <span class="mobile-value">{{ r.member.branch.name }}</span>
+          </div>
+
+          <div>
+            <span class="mobile-label">Plan</span>
+            <span class="mobile-value">{{ r.plan.name }}</span>
+          </div>
+
+          <div>
+            <span class="mobile-label">Plan Price</span>
+            <span class="mobile-value">₹{{ r.plan_price }}</span>
+          </div>
+
+          <div>
+            <span class="mobile-label">Discount</span>
+            <span class="mobile-value text-danger fw-semibold">₹{{ r.discount_amount }}</span>
+          </div>
+
+          <div>
+            <span class="mobile-label">Mode</span>
+            <span class="mobile-value">{{ r.get_payment_mode_display }}</span>
+          </div>
+
+          <div>
+            <span class="mobile-label">Given By</span>
+            <span class="mobile-value">
+              {% if r.created_by %}
+                {{ r.created_by.first_name|default:r.created_by.username }}
+                <small class="d-block text-muted">({{ r.created_by.role }})</small>
+              {% else %}
+                -
+              {% endif %}
+            </span>
+          </div>
+        </div>
+
+      </article>
+
+      {% empty %}
+      <div class="invoice-card">
+        <div class="empty-state">
+          <div class="empty-icon"><i class="bi bi-receipt"></i></div>
+          <div class="empty-title">No invoices found</div>
+          <div class="empty-text">No invoice records match the selected filters.</div>
+        </div>
+      </div>
+      {% endfor %}
+
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+  function nowDateStr() {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+
+  function exportTableToExcel(tableId, filename) {
+    const table = document.getElementById(tableId);
+    if (!table) {
+      alert("Table not found!");
+      return;
+    }
+
+    // clone and export (visible rows only)
+    const clone = table.cloneNode(true);
+
+    // remove hidden rows (if you later add client-side filtering)
+    clone.querySelectorAll("tbody tr").forEach(tr => {
+      if (window.getComputedStyle(tr).display === "none") tr.remove();
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.table_to_sheet(clone, { raw: true });
+
+    XLSX.utils.book_append_sheet(wb, ws, "Invoices");
+    XLSX.writeFile(wb, filename);
+  }
+
+  function exportTableToCSV(tableId, filename) {
+    const table = document.getElementById(tableId);
+    if (!table) {
+      alert("Table not found!");
+      return;
+    }
+
+    const rows = table.querySelectorAll("tr");
+    const csv = [];
+
+    rows.forEach((row) => {
+      if (window.getComputedStyle(row).display === "none") return;
+
+      const cols = row.querySelectorAll("th, td");
+      const rowData = [];
+      cols.forEach((col) => {
+        let text = col.innerText.replace(/\n/g, " ").trim();
+        text = text.replace(/"/g, '""');
+        rowData.push(`"${text}"`);
+      });
+      csv.push(rowData.join(","));
+    });
+
+    const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+  }
+
+  document.getElementById("btnExportExcel").addEventListener("click", function () {
+    exportTableToExcel("invoiceTable", `invoices_${nowDateStr()}.xlsx`);
+  });
+
+  document.getElementById("btnExportCSV").addEventListener("click", function () {
+    exportTableToCSV("invoiceTable", `invoices_${nowDateStr()}.csv`);
+  });
+</script>
+{% endblock %}

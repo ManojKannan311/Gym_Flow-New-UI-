@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+:root{
+  --gf-primary:#2f6fed;--gf-primary-dark:#245bd0;--gf-primary-soft:#edf4ff;
+  --gf-page:#f4f7fb;--gf-border:#e4e9f2;--gf-text:#172033;--gf-muted:#7d8aa5;
+  --gf-success:#16845b;--gf-success-soft:#ebf8f2;--gf-disabled:#69758d;--gf-disabled-soft:#f1f3f6;
+  --gf-danger:#d44949;--gf-danger-soft:#fff0f0;--gf-shadow:0 8px 24px rgba(28,48,86,.07);--gf-radius:18px
+}
+.plans-page{background:var(--gf-page);color:var(--gf-text);padding:22px 18px 34px;min-height:calc(100vh - 70px)}
+.plans-page .page-header,.plans-page .filter-card,.plans-page .plans-card{
+  background:#fff;border:1px solid var(--gf-border);border-radius:var(--gf-radius);box-shadow:var(--gf-shadow)
+}
+.plans-page .page-header{padding:22px 24px;margin-bottom:18px}
+.plans-page .eyebrow{display:flex;align-items:center;gap:9px;color:var(--gf-primary);font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
+.plans-page .eyebrow i,.plans-page .section-icon{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;background:var(--gf-primary-soft);color:var(--gf-primary);border-radius:10px}
+.plans-page .page-title{margin:0;font-size:24px;font-weight:750;letter-spacing:-.02em}
+.plans-page .page-subtitle{margin:4px 0 0;color:var(--gf-muted);font-size:14px}
+.plans-page .header-actions{display:flex;gap:9px}
+.plans-page .header-actions .btn{border-radius:11px;padding:9px 14px;font-weight:650}
+.plans-page .filter-card{padding:20px;margin-bottom:18px}
+.plans-page .section-heading{display:flex;align-items:center;gap:10px;margin-bottom:17px}
+.plans-page .section-heading h6{margin:0;font-weight:750;font-size:15px}
+.plans-page .section-heading p{margin:2px 0 0;color:var(--gf-muted);font-size:12px}
+.plans-page .form-label{display:block;color:#8793a9;font-size:12px;font-weight:650;margin-bottom:7px}
+.plans-page .form-control,.plans-page .form-select{min-height:44px;border:1px solid #dfe5ef;border-radius:11px;color:#27334a;background:#fff;box-shadow:none}
+.plans-page .form-control:focus,.plans-page .form-select:focus{border-color:#8db2ff;box-shadow:0 0 0 3px rgba(47,111,237,.10)}
+.plans-page .form-control::placeholder{color:#aeb8ca}
+.plans-page .btn-primary{background:var(--gf-primary);border-color:var(--gf-primary);border-radius:11px;font-weight:650}
+.plans-page .btn-primary:hover{background:var(--gf-primary-dark);border-color:var(--gf-primary-dark)}
+.plans-page .reset-btn{border-radius:11px;font-weight:600;border-color:#dce4ef}
+.plans-page .plans-card{overflow:hidden}
+.plans-page .plans-card-header{padding:18px 20px;border-bottom:1px solid var(--gf-border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.plans-page .plans-card-header h6{margin:0;font-weight:750;font-size:15px}
+.plans-page .directory-note{display:block;color:var(--gf-muted);font-size:12px;margin-top:3px}
+.plans-page .plan-count{padding:7px 10px;border-radius:999px;background:var(--gf-primary-soft);color:var(--gf-primary);font-size:11px;font-weight:750;white-space:nowrap}
+.plans-page .table-wrap{overflow-x:auto}
+.plans-page table{margin:0!important}
+.plans-page thead th{background:#f8faff;color:#8793a9!important;border-bottom:1px solid var(--gf-border);font-size:11px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;padding:14px 16px!important}
+.plans-page tbody td{border-color:#edf1f6;color:#344057;font-size:13px;padding:14px 16px!important;vertical-align:middle}
+.plans-page tbody tr:hover{background:#fbfcff}
+.plans-page .plan-name{color:#1d2940;font-weight:700;line-height:1.2}
+.plans-page .plan-meta{display:block;color:var(--gf-muted);font-size:11px;margin-top:3px}
+.plans-page .plan-icon{width:42px;height:42px;flex:0 0 42px;border-radius:12px;background:var(--gf-primary-soft);color:var(--gf-primary);display:flex;align-items:center;justify-content:center;font-size:17px}
+.plans-page .price{font-size:14px;font-weight:800;color:#27334a}
+.plans-page .duration{font-weight:650;color:#59677f}
+.plans-page .status-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:750;white-space:nowrap}
+.plans-page .status-pill:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.plans-page .status-active{color:var(--gf-success);background:var(--gf-success-soft)}
+.plans-page .status-disabled{color:var(--gf-disabled);background:var(--gf-disabled-soft)}
+.plans-page .action-btn{width:35px;height:35px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;background:#fff;border:1px solid #e1e7f0;color:#63708a}
+.plans-page .action-btn:hover{border-color:#b9cdf5;color:var(--gf-primary);background:var(--gf-primary-soft)}
+.plans-page .empty-state{padding:48px!important;text-align:center;color:var(--gf-muted)}
+.plans-page .empty-state i{color:#aeb8ca}
+.plans-page .mobile-plan-card{background:#fff;border:1px solid var(--gf-border);border-radius:16px;box-shadow:var(--gf-shadow)}
+.plans-page .mobile-plan-card .plan-icon{width:44px;height:44px;flex-basis:44px}
+.plans-page .mobile-detail{color:#69758d;font-size:12px;line-height:1.9}
+.plans-page .mobile-detail strong{color:#344057}
+.plans-page .mobile-actions{display:grid!important;grid-template-columns:56px 1fr 1fr;gap:8px}
+.plans-page .mobile-actions .btn{min-height:42px;border-radius:10px!important;font-weight:650}
+.plans-page .switch-wrap{display:flex;align-items:center;justify-content:center;border:1px solid #e1e7f0;border-radius:10px;background:#fff}
+.plans-page .form-check-input{cursor:pointer}
+.plans-page .modal-content{border:0;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(20,36,70,.18)}
+.plans-page .modal-header{border-bottom:1px solid #edf1f6;padding:18px 22px}
+.plans-page .modal-body{padding:22px}
+.plans-page .modal-header .modal-title{font-weight:750;font-size:17px}
+.plans-page .modal-section{background:#f8faff;border:1px solid #edf1f6;border-radius:14px;padding:15px;margin-bottom:18px}
+.plans-page .modal-section-title{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--gf-primary);margin-bottom:14px}
+.plans-page .modal-footer{border-top:1px solid #edf1f6;padding:14px 22px}
+@media(max-width:767.98px){
+  .plans-page{padding:14px 10px 26px}
+  .plans-page .page-header{padding:18px}
+  .plans-page .page-title{font-size:20px}
+  .plans-page .header-actions{margin-top:16px;width:100%}
+  .plans-page .header-actions .btn{flex:1}
+  .plans-page .filter-card{padding:16px}
+  .plans-page .mobile-actions{grid-template-columns:52px 1fr 1fr}
+}
+</style>
+
+
+<div class="plans-page container-fluid">
+  <div class="page-header">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+      <div>
+        <div class="eyebrow"><i class="bi bi-award-fill"></i> Membership Configuration</div>
+        <h1 class="page-title">Subscription Plans</h1>
+        <p class="page-subtitle">Manage and control membership plans across all branches.</p>
+      </div>
+      {% if request.user.role == "ADMIN" %}
+      <div class="header-actions">
+        <button class="btn btn-outline-success" id="exportCsv">
+          <i class="bi bi-download me-1"></i> Export
+        </button>
+        <a href="{% url 'Add_plan' %}" class="btn btn-primary">
+          <i class="bi bi-plus-lg me-1"></i> Launch Plan
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="filter-card">
+    <div class="section-heading">
+      <span class="section-icon"><i class="bi bi-funnel-fill"></i></span>
+      <div>
+        <h6>Search &amp; Filter</h6>
+        <p>Find plans by branch, package name, duration or status.</p>
+      </div>
+    </div>
+
+    <form method="get">
+      <div class="row g-3 align-items-end">
+        <div class="col-12 col-lg-4">
+          <label class="form-label">Search Plan</label>
+          <input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Search branch or package name">
+        </div>
+        <div class="col-12 col-lg-3">
+          <label class="form-label">Duration</label>
+          <select name="duration" class="form-select">
+            <option value="">All Duration</option>
+            {% for d in durations %}
+              <option value="{{ d }}" {% if request.GET.duration == d %}selected{% endif %}>{{ d }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-lg-3">
+          <label class="form-label">Status</label>
+          <select name="status" class="form-select">
+            <option value="">All Status</option>
+            <option value="Active" {% if request.GET.status == "Active" %}selected{% endif %}>Active</option>
+            <option value="Disabled" {% if request.GET.status == "Disabled" %}selected{% endif %}>Disabled</option>
+          </select>
+        </div>
+        <div class="col-12 col-lg-2 d-flex gap-2">
+          <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i> Filter</button>
+          <a href="{% url 'plans' %}" class="btn btn-outline-secondary reset-btn w-100">Reset</a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="plans-card d-none d-md-block">
+    <div class="plans-card-header">
+      <div>
+        <h6><i class="bi bi-grid-3x3-gap-fill me-2 text-primary"></i>Plan Directory</h6>
+        <span class="directory-note">Membership packages currently configured for your branches.</span>
+      </div>
+      <span class="plan-count">{{ plans|length }} Plans</span>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table table-hover align-middle" id="membersTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Branch</th>
+            <th>Package Name</th>
+            <th>Duration</th>
+            <th>Price</th>
+            <th>Status</th>
+            {% if request.user.role == "ADMIN" %}
+            <th class="text-center">Action</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in plans %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="plan-icon"><i class="bi bi-building"></i></span>
+                <div>
+                  <div class="plan-name">{{ m.branch.name }}</div>
+                  <span class="plan-meta">Branch</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="plan-name">{{ m.name }}</div>
+              <span class="plan-meta">Membership plan</span>
+            </td>
+            <td><span class="duration">{{ m.duration_days }} days</span></td>
+            <td><span class="price">₹{{ m.price }}</span></td>
+            <td>
+              {% if m.is_active %}
+              <span class="status-pill status-active">Active</span>
+              {% else %}
+              <span class="status-pill status-disabled">Disabled</span>
+              {% endif %}
+            </td>
+            {% if request.user.role == "ADMIN" %}
+            <td class="text-center">
+              <div class="d-flex justify-content-center align-items-center gap-2">
+                <div class="form-check form-switch m-0" title="Toggle plan status">
+                  <input class="form-check-input plan-toggle" type="checkbox" data-id="{{ m.id }}" {% if m.is_active %}checked{% endif %}>
+                </div>
+                <button class="btn action-btn edit-plan-btn" data-bs-toggle="modal" data-bs-target="#Plan_edit" data-id="{{ m.id }}" title="Edit plan">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn action-btn delete-plan-btn" data-id="{{ m.id }}" title="Delete plan">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+            {% endif %}
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="empty-state">
+              <i class="bi bi-award fs-2"></i>
+              <p class="mt-2 mb-0">No subscription plans found.</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MOBILE VIEW -->
+  <div class="d-block d-md-none">
+    {% for p in plans %}
+    <div class="mobile-plan-card mb-3">
+      <div class="card-body p-3">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+          <div class="d-flex align-items-center gap-3">
+            <span class="plan-icon"><i class="bi bi-award-fill"></i></span>
+            <div>
+              <div class="plan-name">{{ p.name }}</div>
+              <span class="plan-meta">{{ p.branch.name }}</span>
+            </div>
+          </div>
+          {% if p.is_active %}
+          <span class="status-pill status-active">Active</span>
+          {% else %}
+          <span class="status-pill status-disabled">Disabled</span>
+          {% endif %}
+        </div>
+
+        <div class="mobile-detail mt-3">
+          <div class="d-flex justify-content-between"><span>Duration</span><strong>{{ p.duration_days }} days</strong></div>
+          <div class="d-flex justify-content-between"><span>Plan Price</span><strong class="text-primary">₹{{ p.price }}</strong></div>
+        </div>
+
+        {% if request.user.role == "ADMIN" %}
+        <div class="mobile-actions mt-3">
+          <div class="switch-wrap">
+            <div class="form-check form-switch m-0">
+              <input class="form-check-input plan-toggle" type="checkbox" data-id="{{ p.id }}" {% if p.is_active %}checked{% endif %}>
+            </div>
+          </div>
+          <button class="btn btn-light border edit-plan-btn" data-id="{{ p.id }}" data-bs-toggle="modal" data-bs-target="#Plan_edit">
+            <i class="bi bi-pencil me-1"></i> Edit
+          </button>
+          <button class="btn btn-light border text-danger delete-plan-btn" data-id="{{ p.id }}">
+            <i class="bi bi-trash me-1"></i> Delete
+          </button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <div class="plans-card empty-state py-5">No subscription plans found.</div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Plan Edit -->
+
+<!-- Modal -->
+<div class="modal fade" id="Plan_edit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel"><i class="bi bi-pencil-square text-primary me-2"></i>Customize Plan</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="modal-section">
+                      <div class="modal-section-title"><i class="bi bi-building me-1"></i> Branch &amp; Plan</div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label small fw-semibold text-muted">
+                                Branch <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" name="branch" id="branch_id" required>
+                                <option value="">Select Branch</option>
+                                {% for branch in branches %}
+                                <option value="{{ branch.id }}">{{ branch.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-1">
+                            <label class="form-label small fw-semibold text-muted">
+                                Plan Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" name="Plan_name" class="form-control" placeholder="Plan name" required>
+                        </div>
+                      </div>
+
+                      <div class="modal-section">
+                        <div class="modal-section-title"><i class="bi bi-calendar3 me-1"></i> Plan Duration &amp; Pricing</div>
+
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label small fw-semibold text-muted">
+                                Plan duration <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" name="Plan_duration" class="form-control" placeholder="10 digit number"
+                                required>
+                        </div>
+                        <div class="col-md-6 mb-1">
+                            <label class="form-label small fw-semibold text-muted">
+                                Amount (₹) <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" name="Plan_amount" class="form-control"
+                                placeholder="Plan Amount" id="price">
+                        </div>
+                      </div>
+
+                    <!-- ================= ACTIONS ================= -->
+                    <div class="row mt-2">
+                        <div class="col-12 d-flex justify-content-end gap-2">
+                            <button class="btn btn-primary px-4 shadow-sm">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Save changes
+                            </button>
+                            <!-- <button type="reset" class="btn btn-light border">
+                      Reset
+                  </button> -->
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div> -->
+        </div>
+    </div>
+</div>
+
+<!-- Plan Edit -->
+
+<script>
+
+    
+    
+
+
+    $(".plan-toggle").change(function () {
+        let planId = $(this).data("id");
+        let isActive = $(this).is(":checked");
+
+        $.ajax({
+            url: "/toggle_plan/" + planId + "/",
+            type: "POST",
+            data: {
+                is_active: isActive,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function () {
+                window.location.reload()
+                console.log("Updated");
+            }
+        });
+    });
+
+    <!-- Getting data for Update -->
+
+    $(document).on("click", ".edit-plan-btn", function () {
+        console.log("Get")
+        let planId = $(this).data("id");
+
+        $.get(`/plan/${planId}/data/`, function (data) {
+            console.log(data)
+            $("#Plan_edit").modal("show");
+
+            $("#Plan_edit").data("id", planId);
+
+            $("#branch_id").val(data.branch_id);
+            $("input[name='Plan_name']").val(data.name);
+            $("input[name='Plan_duration']").val(data.duration_days);
+            $("input[name='Plan_amount']").val(data.price);
+        });
+
+    });
+
+    $("#Plan_edit form").submit(function (e) {
+        e.preventDefault();
+
+        let planId = $("#Plan_edit").data("id");
+
+        $.ajax({
+            url: `/plan/${planId}/update/`,
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (response) {
+                $("#Plan_edit").modal("hide");
+                confirm("Updated Successfully")
+                location.reload();
+            },
+            error: function () {
+                alert("Error updating plan");
+            }
+        });
+    });
+
+    $(document).on("click", ".delete-plan-btn", function (e) {
+
+        let planId = $(this).data("id");
+
+        if (!confirm("Are you sure you want to delete this plan?")) return;
+
+        $.ajax({
+            url: `/plan/${planId}/delete/`,
+            type: "POST",
+            data: {
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function (res) {
+                location.reload();
+            },
+            error: function () {
+                alert("Something went wrong while deleting.");
+            }
+        });
+    });
+
+</script>
+
+
+{% endblock %}

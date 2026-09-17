@@ -1,0 +1,840 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+/* =========================================================
+   GymFlow Enquiries — Premium page redesign
+   Page-scoped styles; backend/template behavior preserved.
+   ========================================================= */
+.gf-enquiries {
+    --gf-primary: #2f6fed;
+    --gf-primary-dark: #245bd0;
+    --gf-primary-soft: #edf4ff;
+    --gf-border: #e3e9f2;
+    --gf-text: #172033;
+    --gf-muted: #7d8aa5;
+    --gf-success: #16845b;
+    --gf-success-soft: #ebf7f1;
+    --gf-warning: #a96f00;
+    --gf-warning-soft: #fff6dc;
+    --gf-danger: #d44949;
+    --gf-danger-soft: #fff0f0;
+    --gf-surface: #fff;
+    --gf-bg: #f7f9fc;
+    --gf-shadow: 0 8px 24px rgba(25,45,80,.06);
+    color: var(--gf-text);
+}
+
+/* Header */
+.gf-enquiries .gf-page-header,
+.gf-enquiries .gf-filter-card,
+.gf-enquiries .gf-directory-card {
+    border: 1px solid var(--gf-border) !important;
+    border-radius: 16px !important;
+    background: var(--gf-surface);
+    box-shadow: var(--gf-shadow) !important;
+}
+
+.gf-enquiries .gf-page-header {
+    overflow: hidden;
+    position: relative;
+}
+
+.gf-enquiries .gf-page-header::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--gf-primary), #78a6ff);
+}
+
+.gf-enquiries .gf-page-body {
+    padding: 20px 22px;
+}
+
+.gf-enquiries .gf-eyebrow {
+    margin-bottom: 5px;
+    color: var(--gf-primary);
+    font-size: .69rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.gf-enquiries .gf-title {
+    margin: 0;
+    font-size: 1.45rem;
+    line-height: 1.2;
+    font-weight: 780;
+    letter-spacing: -.025em;
+}
+
+.gf-enquiries .gf-subtitle {
+    margin: 5px 0 0;
+    color: var(--gf-muted);
+    font-size: .82rem;
+}
+
+.gf-enquiries .gf-title-icon {
+    width: 46px;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    border-radius: 13px;
+    color: var(--gf-primary);
+    background: var(--gf-primary-soft);
+    font-size: 1.15rem;
+}
+
+.gf-enquiries .gf-add-btn {
+    min-height: 42px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #3475ef, #245bd0);
+    box-shadow: 0 7px 17px rgba(47,111,237,.20);
+    font-size: .8rem;
+    font-weight: 750;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.gf-enquiries .gf-add-btn:hover {
+    background: linear-gradient(135deg, #3d7bf4, #245bd0);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(47,111,237,.27);
+}
+
+/* Filters */
+.gf-enquiries .gf-filter-card .card-body {
+    padding: 17px 19px;
+}
+
+.gf-enquiries .gf-filter-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    font-size: .88rem;
+    font-weight: 750;
+}
+
+.gf-enquiries .gf-filter-title-icon {
+    width: 29px;
+    height: 29px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: var(--gf-primary);
+    background: var(--gf-primary-soft);
+}
+
+.gf-enquiries .form-label {
+    margin-bottom: 6px;
+    color: var(--gf-muted);
+    font-size: .69rem;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.gf-enquiries .form-control,
+.gf-enquiries .form-select {
+    min-height: 42px;
+    border: 1px solid var(--gf-border);
+    border-radius: 10px;
+    color: var(--gf-text);
+    background: #fbfcfe;
+    font-size: .8rem;
+    box-shadow: none;
+    transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.gf-enquiries .form-control::placeholder {
+    color: #a6b0c1;
+}
+
+.gf-enquiries .form-control:hover,
+.gf-enquiries .form-select:hover {
+    border-color: #cdd7e7;
+    background: #fff;
+}
+
+.gf-enquiries .form-control:focus,
+.gf-enquiries .form-select:focus {
+    border-color: var(--gf-primary);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(47,111,237,.09);
+}
+
+.gf-enquiries .filter-btn,
+.gf-enquiries .reset-btn {
+    min-height: 42px;
+    border-radius: 10px;
+    font-size: .78rem;
+    font-weight: 750;
+}
+
+.gf-enquiries .filter-btn {
+    border: 0;
+    background: var(--gf-primary);
+}
+
+.gf-enquiries .filter-btn:hover {
+    background: var(--gf-primary-dark);
+}
+
+.gf-enquiries .reset-btn {
+    background: #fff;
+}
+
+/* Directory */
+.gf-enquiries .gf-directory-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 17px 19px;
+    border-bottom: 1px solid var(--gf-border);
+}
+
+.gf-enquiries .gf-directory-title {
+    margin: 0;
+    font-size: .94rem;
+    font-weight: 780;
+}
+
+.gf-enquiries .gf-directory-meta {
+    margin-top: 3px;
+    color: var(--gf-muted);
+    font-size: .72rem;
+}
+
+.gf-enquiries .gf-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.gf-enquiries table {
+    width: 100%;
+    margin: 0;
+    min-width: 920px;
+}
+
+.gf-enquiries thead th {
+    padding: 11px 13px;
+    border-bottom: 1px solid var(--gf-border);
+    background: #f8fafc;
+    color: var(--gf-muted);
+    font-size: .64rem;
+    font-weight: 800;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.gf-enquiries tbody td {
+    padding: 13px;
+    border-color: #edf0f5;
+    color: #405069;
+    font-size: .78rem;
+    vertical-align: middle;
+}
+
+.gf-enquiries tbody tr {
+    transition: background .16s ease;
+}
+
+.gf-enquiries tbody tr:hover {
+    background: #fbfdff;
+}
+
+.gf-enquiries .lead-number {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: var(--gf-muted);
+    background: #f3f6fa;
+    font-size: .7rem;
+    font-weight: 750;
+}
+
+.gf-enquiries .lead-name {
+    color: var(--gf-text);
+    font-size: .81rem;
+    font-weight: 750;
+}
+
+.gf-enquiries .lead-phone {
+    margin-top: 2px;
+    color: var(--gf-muted);
+    font-size: .69rem;
+}
+
+.gf-enquiries .lead-source {
+    margin-top: 3px;
+    color: #65738a;
+    font-size: .66rem;
+}
+
+.gf-enquiries .status-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 27px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: .66rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.gf-enquiries .status-open {
+    color: #61708a;
+    background: #eef2f7;
+}
+
+.gf-enquiries .status-followup {
+    color: var(--gf-warning);
+    background: var(--gf-warning-soft);
+}
+
+.gf-enquiries .status-won {
+    color: var(--gf-success);
+    background: var(--gf-success-soft);
+}
+
+.gf-enquiries .status-lost {
+    color: var(--gf-danger);
+    background: var(--gf-danger-soft);
+}
+
+.gf-enquiries .followup-date {
+    font-weight: 700;
+    color: #44516a;
+}
+
+.gf-enquiries .note-cell {
+    max-width: 180px;
+    color: var(--gf-muted);
+}
+
+.gf-enquiries .action-group {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+.gf-enquiries .action-btn {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    font-size: .78rem;
+    transition: transform .16s ease, box-shadow .16s ease;
+}
+
+.gf-enquiries .action-btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Empty state */
+.gf-enquiries .empty-state {
+    padding: 48px 20px !important;
+    text-align: center;
+}
+
+.gf-enquiries .empty-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    color: var(--gf-muted);
+    background: #f3f6fa;
+    font-size: 1.15rem;
+}
+
+.gf-enquiries .empty-title {
+    color: #4b5870;
+    font-size: .82rem;
+    font-weight: 650;
+}
+
+/* Modals */
+.gf-enquiries-modal .modal-content {
+    overflow: hidden;
+    border: 1px solid var(--gf-border);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(15,28,52,.18);
+}
+
+.gf-enquiries-modal .modal-header {
+    padding: 17px 19px;
+    border-bottom: 1px solid var(--gf-border);
+}
+
+.gf-enquiries-modal .modal-title {
+    font-size: .95rem;
+    font-weight: 780;
+}
+
+.gf-enquiries-modal .modal-body {
+    padding: 19px;
+}
+
+.gf-enquiries-modal .modal-footer {
+    padding: 13px 19px;
+    border-top: 1px solid var(--gf-border);
+    background: #fbfcfe;
+}
+
+.gf-enquiries-modal .modal-body .form-control,
+.gf-enquiries-modal .modal-body .form-select {
+    min-height: 42px;
+    border-radius: 10px;
+    border-color: var(--gf-border);
+    font-size: .8rem;
+}
+
+.gf-enquiries-modal .modal-body textarea.form-control {
+    min-height: 90px;
+}
+
+.gf-enquiries-modal .btn {
+    border-radius: 9px;
+    font-size: .78rem;
+    font-weight: 700;
+}
+
+/* Mobile */
+@media (max-width: 767.98px) {
+    .gf-enquiries .gf-page-body {
+        padding: 17px;
+    }
+
+    .gf-enquiries .gf-title {
+        font-size: 1.25rem;
+    }
+
+    .gf-enquiries .gf-add-btn {
+        width: 100%;
+    }
+
+    .gf-enquiries .gf-filter-card .card-body {
+        padding: 15px;
+    }
+
+    .gf-enquiries .gf-directory-head {
+        padding: 15px;
+    }
+
+    .gf-enquiries table {
+        min-width: 820px;
+    }
+}
+</style>
+
+<div class="gf-enquiries">
+  <div class="container-fluid px-3 px-lg-4 py-3">
+
+    <!-- Page Header -->
+    <div class="card gf-page-header mb-3">
+      <div class="gf-page-body">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+          <div class="d-flex align-items-center gap-3">
+            <span class="gf-title-icon">
+              <i class="bi bi-person-lines-fill"></i>
+            </span>
+            <div>
+              <div class="gf-eyebrow">Lead management</div>
+              <h1 class="gf-title">Enquiries</h1>
+              <p class="gf-subtitle">Add enquiries, track follow-ups and convert prospects into members.</p>
+            </div>
+          </div>
+
+          <button class="btn btn-primary gf-add-btn"
+                  data-bs-toggle="modal"
+                  data-bs-target="#addEnquiryModal">
+            <i class="bi bi-plus-circle me-1"></i>
+            Add Enquiry
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <form method="get" class="card gf-filter-card mb-3">
+      <div class="card-body">
+        <div class="gf-filter-title">
+          <span class="gf-filter-title-icon"><i class="bi bi-funnel"></i></span>
+          Search &amp; Filter
+        </div>
+
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-md-4">
+            <label class="form-label">Search (Name / Phone)</label>
+            <input type="text" name="q" class="form-control"
+                   value="{{ filters.q }}" placeholder="Search enquiries...">
+          </div>
+
+          <div class="col-12 col-md-2">
+            <label class="form-label">Branch</label>
+            <select name="branch" class="form-select">
+              <option value="">All Branches</option>
+              {% for b in branches %}
+                <option value="{{ b.id }}" {% if filters.branch == b.id|stringformat:"s" %}selected{% endif %}>{{ b.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-12 col-md-2">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+              <option value="">All</option>
+              {% for k,v in status_choices %}
+                <option value="{{ k }}" {% if filters.status == k %}selected{% endif %}>{{ v }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-12 col-md-2">
+            <label class="form-label">Follow-up</label>
+            <select name="followup" class="form-select">
+              <option value="">All</option>
+              <option value="today" {% if filters.followup == "today" %}selected{% endif %}>Today</option>
+              <option value="overdue" {% if filters.followup == "overdue" %}selected{% endif %}>Overdue</option>
+              <option value="upcoming" {% if filters.followup == "upcoming" %}selected{% endif %}>Upcoming</option>
+            </select>
+          </div>
+
+          <div class="col-12 col-md-2 d-flex gap-2">
+            <button class="btn btn-primary filter-btn w-100">
+              <i class="bi bi-funnel me-1"></i>Apply
+            </button>
+            <a class="btn btn-light border reset-btn w-100" href="{% url 'enquiry_page' %}">Reset</a>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- Enquiry Directory -->
+    <div class="card gf-directory-card">
+      <div class="gf-directory-head">
+        <div>
+          <h2 class="gf-directory-title">
+            <i class="bi bi-card-list me-2 text-primary"></i>Enquiry Directory
+          </h2>
+          <div class="gf-directory-meta">Manage leads, follow-ups and conversion actions.</div>
+        </div>
+        <span class="badge rounded-pill text-bg-light border px-3 py-2">
+          {{ rows|length }} Records
+        </span>
+      </div>
+
+      <div class="gf-table-wrap">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Lead</th>
+              <th>Branch</th>
+              <th>Interested</th>
+              <th>Status</th>
+              <th>Next Follow-up</th>
+              <th>Last Note</th>
+              <th>Created By</th>
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for r in rows %}
+            <tr>
+              <td>
+                <span class="lead-number">{{ forloop.counter }}</span>
+              </td>
+
+              <td>
+                <div class="lead-name">{{ r.name }}</div>
+                <div class="lead-phone"><i class="bi bi-telephone me-1"></i>{{ r.phone }}</div>
+                {% if r.source %}
+                  <div class="lead-source">Source: <span>{{ r.source }}</span></div>
+                {% endif %}
+              </td>
+
+              <td>{{ r.branch.name|default:"-" }}</td>
+              <td>{{ r.interested_plan|default:"-" }}</td>
+
+              <td>
+                {% if r.status == "open" %}
+                  <span class="status-pill status-open">Open</span>
+                {% elif r.status == "followup" %}
+                  <span class="status-pill status-followup">Follow-up</span>
+                {% elif r.status == "won" %}
+                  <span class="status-pill status-won">Closed - Won</span>
+                {% else %}
+                  <span class="status-pill status-lost">Closed - Lost</span>
+                {% endif %}
+              </td>
+
+              <td class="followup-date">
+                {{ r.next_followup|date:"Y-m-d"|default:"-" }}
+              </td>
+
+              <td class="note-cell small">
+                {{ r.last_followup_note|default:"-" }}
+              </td>
+
+              <td class="small">
+                {% if r.created_by %}
+                  <span class="fw-semibold">{{ r.created_by.first_name|default:r.created_by.username }}</span>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+
+              <td class="text-center py-2">
+                <div class="action-group">
+
+                  <!-- Edit -->
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary action-btn btn-enq-edit"
+                    data-id="{{ r.id }}"
+                    data-status="{{ r.status }}"
+                    data-followup="{{ r.next_followup|date:'Y-m-d' }}"
+                    data-note="{{ r.last_followup_note|default_if_none:''|escapejs }}"
+                    title="Edit / Update Follow-up">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+
+                  <!-- WhatsApp -->
+                  <a class="btn btn-success btn-sm action-btn"
+                     target="_blank"
+                     href="https://wa.me/91{{ r.phone }}?text=Hello%20{{ r.name|urlencode }}%20%F0%9F%91%8B%0A%0AThis%20is%20a%20friendly%20follow-up%20from%20{{ request.user.gym.name|urlencode }}.%0ARegarding%20your%20gym%20enquiry.%0A%0ANext%20follow-up%3A%20{{ r.next_followup|date:'Y-m-d' }}%0A%0AReply%20anytime%20%F0%9F%92%AA"
+                     title="WhatsApp">
+                    <i class="bi bi-whatsapp"></i>
+                  </a>
+
+                  <!-- Call -->
+                  <a class="btn btn-primary btn-sm action-btn"
+                     target="_blank"
+                     href="tel:+91{{ r.phone }}"
+                     title="Call">
+                    <i class="bi bi-telephone-fill"></i>
+                  </a>
+
+                  <!-- Convert to Member -->
+                  <a class="btn btn-sm btn-warning action-btn"
+                     href="{% url 'Add_members' %}?phone={{ r.phone }}&name={{ r.name|urlencode }}"
+                     title="Convert to Member">
+                    <i class="bi bi-person-plus"></i>
+                  </a>
+
+                </div>
+              </td>
+            </tr>
+
+            {% empty %}
+            <tr>
+              <td colspan="9" class="empty-state">
+                <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+                <div class="empty-title">No enquiries found</div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- Add Enquiry Modal -->
+<div class="modal fade gf-enquiries-modal" id="addEnquiryModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="modal-header">
+          <div>
+            <div class="small text-primary fw-bold text-uppercase mb-1">Lead management</div>
+            <h5 class="modal-title">Add Enquiry</h5>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Name *</label>
+              <input type="text" name="name" class="form-control" required>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Phone *</label>
+              <input type="text" name="phone" class="form-control" required>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Branch</label>
+              <select name="branch" class="form-select">
+                <option value="">-</option>
+                {% for b in branches %}
+                  <option value="{{ b.id }}">{{ b.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Source</label>
+              <input type="text" name="source" class="form-control" placeholder="Walk-in / Instagram / Referral">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Interested Plan</label>
+              <input type="text" name="interested_plan" class="form-control" placeholder="6 Month / 12 Month...">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Next Follow-up</label>
+              <input type="date" name="next_followup" class="form-control">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Note</label>
+              <textarea name="note" class="form-control" rows="3" placeholder="Any notes..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-light border" data-bs-dismiss="modal" type="button">Cancel</button>
+          <button class="btn btn-primary" type="submit">
+            <i class="bi bi-check2-circle me-1"></i>Save Enquiry
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- Update Enquiry Modal -->
+<div class="modal fade gf-enquiries-modal" id="updateEnquiryModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <div>
+          <div class="small text-primary fw-bold text-uppercase mb-1">Follow-up management</div>
+          <h5 class="modal-title">Update Enquiry</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div id="enq_err" class="alert alert-danger d-none"></div>
+
+        <input type="hidden" id="enq_id">
+
+        <div class="mb-3">
+          <label class="form-label">Status</label>
+          <select id="enq_status" class="form-select">
+            {% for k,v in status_choices %}
+              <option value="{{ k }}">{{ v }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Next Follow-up</label>
+          <input type="date" id="enq_next_followup" class="form-control">
+          <small class="text-muted">If status is Closed, follow-up will be cleared automatically.</small>
+        </div>
+
+        <div>
+          <label class="form-label">Follow-up Note</label>
+          <input type="text" id="enq_note" class="form-control" placeholder="Called / Visit planned / etc">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-light border" data-bs-dismiss="modal" type="button">Cancel</button>
+        <button class="btn btn-primary" id="btnEnqSave" type="button">
+          <i class="bi bi-check2-circle me-1"></i>Save Changes
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+
+$(document).on("click", ".btn-enq-edit", function () {
+        const id = $(this).data("id");
+        const status = $(this).data("status") || "open";
+        const followup = $(this).data("followup") || "";
+        const note = $(this).data("note") || "";
+    
+        openUpdateEnquiry(id, status, followup, note);
+})
+    
+function openUpdateEnquiry(id, status, nextFollowup, note) {
+  $("#enq_id").val(id);
+  $("#enq_status").val(status || "open");
+  $("#enq_next_followup").val(nextFollowup || "");
+  $("#enq_note").val(note || "");
+  $("#enq_err").addClass("d-none").text("");
+
+  bootstrap.Modal.getOrCreateInstance(document.getElementById("updateEnquiryModal")).show();
+}
+
+$("#btnEnqSave").on("click", function () {
+  const id = $("#enq_id").val();
+  const status = $("#enq_status").val();
+  const next_followup = $("#enq_next_followup").val();
+  const last_followup_note = $("#enq_note").val();
+
+  $.ajax({
+    url: `/enquiries/${id}/update/`,
+    type: "POST",
+    data: {
+      status,
+      next_followup,
+      last_followup_note,
+      csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+    },
+    success: function(res){
+      if(res.success){
+        location.reload();
+      }else{
+        $("#enq_err").removeClass("d-none").text(res.error || "Failed");
+      }
+    },
+    error: function(xhr){
+      $("#enq_err").removeClass("d-none").text(xhr.responseJSON?.error || "Failed");
+    }
+  });
+});
+</script>
+{% endblock %}

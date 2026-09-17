@@ -1,0 +1,757 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>GymFlow</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --gf-blue: #2f6fed;
+            --gf-blue-dark: #245bd0;
+            --gf-blue-soft: #edf4ff;
+            --gf-ink: #172033;
+            --gf-muted: #7d8aa5;
+            --gf-border: #e5eaf2;
+            --gf-bg: #f5f7fb;
+            --gf-sidebar: #101827;
+            --gf-sidebar-2: #151f31;
+            --gf-sidebar-text: #aeb9cc;
+            --gf-sidebar-active: #ffffff;
+            --gf-shadow: 0 12px 35px rgba(20, 34, 60, .10);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--gf-bg);
+            color: var(--gf-ink);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* =====================================================
+           PREMIUM SIDEBAR
+           ===================================================== */
+        .sidebar {
+            width: 268px;
+            position: fixed;
+            inset: 0 auto 0 0;
+            z-index: 1050;
+            display: flex;
+            flex-direction: column;
+            padding: 18px 14px 16px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background:
+                radial-gradient(circle at 15% 0%, rgba(47,111,237,.18), transparent 27%),
+                linear-gradient(180deg, var(--gf-sidebar) 0%, #0d1522 100%);
+            border-right: 1px solid rgba(255,255,255,.06);
+            box-shadow: 10px 0 35px rgba(10,20,40,.08);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,.15) transparent;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 5px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,.14);
+            border-radius: 99px;
+        }
+
+        .brand-wrap {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 8px 11px 22px;
+            margin-bottom: 5px;
+        }
+
+        .brand-mark {
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            border-radius: 12px;
+            color: #fff;
+            background: linear-gradient(135deg, #3d7bf4, #245bd0);
+            box-shadow: 0 8px 20px rgba(47,111,237,.30);
+            font-size: 1.12rem;
+            animation: brandPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes brandPulse {
+            0%, 100% { box-shadow: 0 8px 20px rgba(47,111,237,.25); }
+            50% { box-shadow: 0 10px 28px rgba(47,111,237,.45); }
+        }
+
+        .brand-logo {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 24px;
+            letter-spacing: -.5px;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .brand-logo span { color: #72a2ff; }
+
+        .brand-caption {
+            margin-top: 5px;
+            color: #71809a;
+            font-size: .64rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        .nav-label {
+            padding: 10px 12px 7px;
+            color: #5f6d83;
+            font-size: .62rem;
+            font-weight: 800;
+            letter-spacing: .13em;
+            text-transform: uppercase;
+        }
+
+        .sidebar > a,
+        .sidebar .menu-toggle,
+        .sidebar form .dropdown-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            width: 100%;
+            min-height: 45px;
+            margin: 2px 0;
+            padding: 0 12px;
+            border: 0;
+            border-radius: 11px;
+            color: var(--gf-sidebar-text);
+            background: transparent;
+            text-decoration: none;
+            font-size: .83rem;
+            font-weight: 600;
+            transition: color .2s ease, background .2s ease, transform .2s ease;
+        }
+
+        .sidebar > a > i:first-child,
+        .sidebar .menu-toggle > i:first-child,
+        .sidebar form .dropdown-item > i:first-child {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+            color: #7f8ca3;
+            transition: color .2s ease, transform .2s ease;
+        }
+
+        .sidebar > a:hover,
+        .sidebar .menu-toggle:hover,
+        .sidebar form .dropdown-item:hover {
+            color: #fff;
+            background: rgba(255,255,255,.065);
+            transform: translateX(2px);
+        }
+
+        .sidebar > a:hover > i:first-child,
+        .sidebar .menu-toggle:hover > i:first-child,
+        .sidebar form .dropdown-item:hover > i:first-child {
+            color: #78a6ff;
+        }
+
+        /* Active link: works with Django's current page JS/class if applied */
+        .sidebar > a.active,
+        .sidebar > a[aria-current="page"] {
+            color: #fff;
+            background: linear-gradient(90deg, rgba(47,111,237,.25), rgba(47,111,237,.08));
+            box-shadow: inset 0 0 0 1px rgba(93,145,255,.10);
+        }
+
+        .sidebar > a.active::before,
+        .sidebar > a[aria-current="page"]::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 9px;
+            bottom: 9px;
+            width: 3px;
+            border-radius: 0 4px 4px 0;
+            background: #4f88f7;
+            box-shadow: 0 0 12px rgba(79,136,247,.65);
+        }
+
+        .sidebar > a.active > i:first-child,
+        .sidebar > a[aria-current="page"] > i:first-child {
+            color: #76a3ff;
+        }
+
+        .menu-toggle .bi-chevron-down {
+            margin-left: auto;
+            width: auto !important;
+            font-size: .7rem !important;
+            color: #66748c !important;
+            transition: transform .25s ease, color .2s ease;
+        }
+
+        .menu-toggle.open .bi-chevron-down {
+            transform: rotate(180deg);
+            color: #78a6ff !important;
+        }
+
+        /* Premium dark submenu — blends into the sidebar instead of
+           switching to a bright/white dropdown panel. */
+
+        .menu-toggle.open {
+            color: #eef4ff;
+            background: rgba(255,255,255,.035);
+        }
+
+        .menu-toggle.open > i:first-child {
+            color: #78a6ff !important;
+        }
+
+        .submenu {
+            display: none;
+            margin: 3px 0 7px 15px;
+            padding: 5px 7px 5px 13px;
+            border-left: 1px solid rgba(112,150,220,.20);
+            border-radius: 0 11px 11px 0;
+            background: rgba(255,255,255,.025);
+            animation: submenuIn .22s ease;
+        }
+
+        .submenu.show { display: block; }
+
+        @keyframes submenuIn {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .submenu a {
+            position: relative;
+            display: flex;
+            align-items: center;
+            min-height: 38px;
+            margin: 2px 0;
+            padding: 0 10px;
+            border-radius: 9px;
+            color: #91a0b8;
+            text-decoration: none;
+            font-size: .77rem;
+            font-weight: 550;
+            transition:
+                color .18s ease,
+                background .18s ease,
+                padding-left .18s ease,
+                box-shadow .18s ease;
+        }
+
+        .submenu a::before {
+            content: "";
+            width: 5px;
+            height: 5px;
+            margin-right: 12px;
+            flex: 0 0 auto;
+            border-radius: 50%;
+            background: #58677f;
+            transition: all .18s ease;
+        }
+
+        .submenu a:hover {
+            color: #eaf1ff;
+            background: rgba(72,125,232,.12);
+            padding-left: 13px;
+        }
+
+        .submenu a:hover::before,
+        .submenu a.active::before {
+            background: #6d9cff;
+            box-shadow: 0 0 9px rgba(109,156,255,.7);
+        }
+
+        .submenu a.active {
+            color: #f4f7ff;
+            background: linear-gradient(
+                90deg,
+                rgba(62,116,229,.28),
+                rgba(62,116,229,.12)
+            );
+            box-shadow: inset 0 0 0 1px rgba(108,156,255,.10);
+        }
+
+        .submenu a.active::after {
+            content: "";
+            position: absolute;
+            right: 8px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #76a5ff;
+            box-shadow: 0 0 8px rgba(118,165,255,.7);
+        }
+
+        .sidebar form {
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,.07);
+        }
+
+        .sidebar form .dropdown-item {
+            color: #aeb9cc;
+            cursor: pointer;
+        }
+
+        .sidebar form .dropdown-item:hover {
+            color: #ff9a9a;
+            background: rgba(212,73,73,.08);
+        }
+
+        /* =====================================================
+           PREMIUM TOP NAV
+           ===================================================== */
+        .content {
+            min-height: 100vh;
+            margin-left: 268px;
+            transition: margin-left .25s ease;
+        }
+
+        .top-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            min-height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background: rgba(255,255,255,.92);
+            border-bottom: 1px solid rgba(229,234,242,.9);
+            box-shadow: 0 4px 20px rgba(25,45,80,.04);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .nav-left {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mobile-menu-btn {
+            width: 41px;
+            height: 41px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--gf-border);
+            border-radius: 11px;
+            color: var(--gf-ink);
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(20,34,60,.05);
+        }
+
+        .mobile-menu-btn:hover {
+            color: var(--gf-blue);
+            border-color: #c9d7f1;
+        }
+
+        .welcome-block {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 0;
+        }
+
+        .welcome-avatar {
+            width: 39px;
+            height: 39px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            border-radius: 12px;
+            color: var(--gf-blue);
+            background: var(--gf-blue-soft);
+            font-size: 1rem;
+        }
+
+        .welcome-copy {
+            min-width: 0;
+            line-height: 1.15;
+        }
+
+        .greeting {
+            display: block;
+            color: var(--gf-muted);
+            font-size: .69rem;
+            font-weight: 600;
+            letter-spacing: .02em;
+        }
+
+        .username {
+            display: inline-block;
+            max-width: 260px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--gf-ink);
+            font-size: .9rem;
+            font-weight: 750;
+        }
+
+        .wave {
+            display: inline-block;
+            margin-left: 2px;
+            transform-origin: 70% 70%;
+            animation: waveAnim 2.4s ease-in-out infinite;
+        }
+
+        @keyframes waveAnim {
+            0%, 55%, 100% { transform: rotate(0deg); }
+            60% { transform: rotate(14deg); }
+            66% { transform: rotate(-8deg); }
+            72% { transform: rotate(14deg); }
+            78% { transform: rotate(-4deg); }
+            84% { transform: rotate(8deg); }
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .nav-action {
+            width: 41px;
+            height: 41px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid transparent;
+            border-radius: 11px;
+            color: #697791;
+            background: transparent;
+            text-decoration: none;
+            transition: all .2s ease;
+        }
+
+        .nav-action:hover {
+            color: var(--gf-blue);
+            background: var(--gf-blue-soft);
+            border-color: #dbe6fa;
+            transform: translateY(-1px);
+        }
+
+        .nav-action i { font-size: 1.02rem; }
+
+        .refresh-icon {
+            transition: transform .55s ease;
+        }
+
+        .nav-action:hover .refresh-icon {
+            transform: rotate(180deg);
+        }
+
+        .profile-action {
+            color: #fff;
+            background: var(--gf-blue);
+            box-shadow: 0 7px 16px rgba(47,111,237,.22);
+        }
+
+        .profile-action:hover {
+            color: #fff;
+            background: var(--gf-blue-dark);
+            border-color: transparent;
+            box-shadow: 0 9px 20px rgba(47,111,237,.28);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1040;
+            background: rgba(9,16,28,.48);
+            backdrop-filter: blur(3px);
+        }
+
+        /* =====================================================
+           MOBILE
+           ===================================================== */
+        @media (max-width: 991.98px) {
+            .sidebar {
+                transform: translateX(-105%);
+                transition: transform .28s cubic-bezier(.22,.61,.36,1);
+                width: min(286px, 86vw);
+                box-shadow: 20px 0 45px rgba(10,20,40,.22);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+                animation: overlayIn .22s ease;
+            }
+
+            @keyframes overlayIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            .top-navbar {
+                min-height: 66px;
+                padding: 0 14px;
+            }
+
+            .mobile-menu-btn {
+                display: inline-flex;
+            }
+
+            .welcome-avatar { display: none; }
+
+            .username {
+                max-width: 170px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .top-navbar { padding: 0 11px; }
+            .top-actions { gap: 2px; }
+            .nav-action { width: 38px; height: 38px; }
+
+            .greeting { font-size: .63rem; }
+            .username { max-width: 145px; font-size: .84rem; }
+
+            .mobile-menu-btn {
+                width: 38px;
+                height: 38px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Premium Sidebar -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand-wrap">
+            <span class="brand-mark"><i class="bi bi-lightning-charge-fill"></i></span>
+            <div>
+                <h4 class="brand-logo">Gym<span>Flow</span></h4>
+                <div class="brand-caption">Management Suite</div>
+            </div>
+        </div>
+
+        <div class="nav-label">Workspace</div>
+
+        <a href="{% url 'dashboard' %}">
+            <i class="bi bi-grid-1x2-fill"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="javascript:void(0)" class="menu-toggle">
+            <i class="bi bi-people-fill"></i>
+            <span>Members</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <div class="submenu">
+            <a href="{% url 'member_list' %}">Member List</a>
+            <a href="{% url 'Add_members' %}">Add Member</a>
+            <a href="{% url 'enquiry_page' %}">Enquiries</a>
+            <a href="{% url 'archived_members' %}">Archived Members</a>
+        </div>
+
+        <a href="javascript:void(0)" class="menu-toggle">
+            <i class="bi bi-award-fill"></i>
+            <span>Memberships</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <div class="submenu">
+            <a href="{% url 'plans' %}">Plans</a>
+            <a href="{% url 'renewals_page' %}">Renewals</a>
+        </div>
+
+        <a href="javascript:void(0)" class="menu-toggle">
+            <i class="bi bi-wallet2"></i>
+            <span>Payments</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <div class="submenu">
+            <a href="{% url 'paid_members_page' %}">Paid Members</a>
+            <a href="{% url 'unpaid_members_page' %}">Pending Payments</a>
+            <a href="{% url 'pending_payments' %}">Outstanding Payment</a>
+        </div>
+
+        <div class="nav-label">Insights</div>
+
+        <a href="javascript:void(0)" class="menu-toggle">
+            <i class="bi bi-bar-chart-fill"></i>
+            <span>Reports</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <div class="submenu">
+            <a href="{% url 'discount_report' %}">Discount Report</a>
+            <a href="{% url 'invoices_page' %}">Invoices Report</a>
+        </div>
+
+        {% if request.user.role == "ADMIN" %}
+        <div class="nav-label">Administration</div>
+
+        <a href="javascript:void(0)" class="menu-toggle">
+            <i class="bi bi-sliders2"></i>
+            <span>Settings</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <div class="submenu">
+            <a href="{% url 'gym_profile' %}">Profile</a>
+            {% if request.user.gym.subscription_type == "pro" %}
+            <a href="{% url 'whatsapp_conf' %}">WhatsApp Config</a>
+            <a href="{% url 'whatsapp_logs_page' %}">WhatsApp Logs</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'logout' %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="dropdown-item px-3">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Logout</span>
+            </button>
+        </form>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+
+        <!-- Premium Top Navbar -->
+        <nav class="top-navbar">
+            <div class="nav-left">
+
+                <button class="mobile-menu-btn" id="toggleSidebar" type="button" aria-label="Open navigation">
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <div class="welcome-block">
+                    <span class="welcome-avatar">
+                        <i class="bi bi-person-check-fill"></i>
+                    </span>
+
+                    <div class="welcome-copy">
+                        <span class="greeting">Welcome Back</span>
+                        <span class="username">{{ request.user.username }}</span>
+                        <span class="wave">👋</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="top-actions">
+                <a href="" class="nav-action" aria-label="Refresh page" title="Refresh">
+                    <i class="bi bi-arrow-clockwise refresh-icon"></i>
+                </a>
+
+                <a href="{% url 'gym_profile' %}" class="nav-action profile-action"
+                   aria-label="Profile settings" title="Profile Settings">
+                    <i class="bi bi-gear-fill"></i>
+                </a>
+            </div>
+        </nav>
+
+        {% block content %}
+        {% endblock %}
+
+        <script src="{% static 'Js/dashboard.js' %}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            function setGreeting() {
+                const hour = new Date().getHours();
+                let text = "Welcome Back";
+
+                if (hour < 12) text = "Good Morning";
+                else if (hour < 17) text = "Good Afternoon";
+                else text = "Good Evening";
+
+                const greeting = document.querySelector(".greeting");
+                if (greeting) greeting.textContent = text;
+            }
+
+            setGreeting();
+
+            /* Premium sidebar interaction.
+               Dropdown opening is handled by dashboard.js so that
+               only one click handler controls each submenu. */
+            $(function () {
+                $("#toggleSidebar").on("click", function () {
+                    $("#sidebar").addClass("show");
+                    $("#sidebarOverlay").addClass("show");
+                    $("body").css("overflow", "hidden");
+                });
+
+                $("#sidebarOverlay").on("click", function () {
+                    $("#sidebar").removeClass("show");
+                    $("#sidebarOverlay").removeClass("show");
+                    $("body").css("overflow", "");
+                });
+
+                $(document).on("click", ".sidebar a:not(.menu-toggle)", function () {
+                    if (window.innerWidth <= 991) {
+                        $("#sidebar").removeClass("show");
+                        $("#sidebarOverlay").removeClass("show");
+                        $("body").css("overflow", "");
+                    }
+                });
+
+                /* Automatically open the submenu containing the current URL. */
+                const currentPath = window.location.pathname;
+                $(".submenu a").each(function () {
+                    const linkPath = new URL(this.href, window.location.origin).pathname;
+
+                    if (linkPath === currentPath) {
+                        $(this).addClass("active");
+                        const $submenu = $(this).closest(".submenu");
+                        $submenu.show();
+                        $submenu.prev(".menu-toggle").addClass("open");
+                    }
+                });
+
+                /* Dashboard active state */
+                $(".sidebar > a").each(function () {
+                    const href = this.getAttribute("href");
+                    if (href && href !== "javascript:void(0)" && href === window.location.pathname) {
+                        $(this).addClass("active");
+                    }
+                });
+            });
+        </script>
+    </main>
+</body>
+</html>

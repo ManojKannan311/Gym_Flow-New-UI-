@@ -1,0 +1,672 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+/* =========================================================
+   GymFlow Archived Members — Premium redesign
+   ========================================================= */
+.gf-archive {
+    --gf-primary: #2f6fed;
+    --gf-primary-dark: #245bd0;
+    --gf-primary-soft: #edf4ff;
+    --gf-border: #e3e9f2;
+    --gf-text: #172033;
+    --gf-muted: #7d8aa5;
+    --gf-success: #16845b;
+    --gf-success-soft: #ebf7f1;
+    --gf-danger: #d44949;
+    --gf-danger-soft: #fff0f0;
+    --gf-surface: #fff;
+    --gf-bg: #f7f9fc;
+    --gf-shadow: 0 8px 24px rgba(25,45,80,.06);
+    color: var(--gf-text);
+}
+
+/* Page header */
+.gf-archive .gf-page-header,
+.gf-archive .gf-filter-card,
+.gf-archive .gf-directory-card {
+    border: 1px solid var(--gf-border) !important;
+    border-radius: 16px !important;
+    background: var(--gf-surface);
+    box-shadow: var(--gf-shadow) !important;
+}
+
+.gf-archive .gf-page-header {
+    position: relative;
+    overflow: hidden;
+}
+
+.gf-archive .gf-page-header::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--gf-primary), #79a5ff);
+}
+
+.gf-archive .gf-header-body {
+    padding: 20px 22px;
+}
+
+.gf-archive .gf-title-icon {
+    width: 46px;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    border-radius: 13px;
+    color: var(--gf-primary);
+    background: var(--gf-primary-soft);
+    font-size: 1.15rem;
+}
+
+.gf-archive .gf-eyebrow {
+    margin-bottom: 4px;
+    color: var(--gf-primary);
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.gf-archive .gf-title {
+    margin: 0;
+    font-size: 1.42rem;
+    line-height: 1.2;
+    font-weight: 780;
+    letter-spacing: -.025em;
+}
+
+.gf-archive .gf-subtitle {
+    margin: 5px 0 0;
+    color: var(--gf-muted);
+    font-size: .81rem;
+}
+
+.gf-archive .gf-back-btn {
+    min-height: 41px;
+    padding: 0 15px;
+    border-radius: 10px;
+    font-size: .78rem;
+    font-weight: 750;
+}
+
+/* Filter */
+.gf-archive .gf-filter-card .card-body {
+    padding: 17px 19px;
+}
+
+.gf-archive .gf-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    font-size: .88rem;
+    font-weight: 760;
+}
+
+.gf-archive .gf-section-icon {
+    width: 29px;
+    height: 29px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: var(--gf-primary);
+    background: var(--gf-primary-soft);
+}
+
+.gf-archive .form-label {
+    margin-bottom: 6px;
+    color: var(--gf-muted);
+    font-size: .67rem;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.gf-archive .form-control,
+.gf-archive .form-select {
+    min-height: 42px;
+    border: 1px solid var(--gf-border);
+    border-radius: 10px;
+    background: #fbfcfe;
+    color: var(--gf-text);
+    font-size: .79rem;
+    box-shadow: none;
+    transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.gf-archive .form-control:hover,
+.gf-archive .form-select:hover {
+    border-color: #ccd7e7;
+    background: #fff;
+}
+
+.gf-archive .form-control:focus,
+.gf-archive .form-select:focus {
+    border-color: var(--gf-primary);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(47,111,237,.09);
+}
+
+.gf-archive .filter-btn,
+.gf-archive .reset-btn {
+    min-height: 42px;
+    border-radius: 10px;
+    font-size: .77rem;
+    font-weight: 750;
+}
+
+.gf-archive .filter-btn {
+    border: 0;
+    background: var(--gf-primary);
+}
+
+.gf-archive .filter-btn:hover {
+    background: var(--gf-primary-dark);
+}
+
+/* Directory */
+.gf-archive .gf-directory-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 17px 19px;
+    border-bottom: 1px solid var(--gf-border);
+}
+
+.gf-archive .gf-directory-title {
+    margin: 0;
+    font-size: .94rem;
+    font-weight: 780;
+}
+
+.gf-archive .gf-directory-meta {
+    margin-top: 3px;
+    color: var(--gf-muted);
+    font-size: .71rem;
+}
+
+.gf-archive .gf-count {
+    color: #68758b;
+    background: #f7f9fc !important;
+    border-color: var(--gf-border) !important;
+    font-size: .67rem;
+    font-weight: 750;
+}
+
+.gf-archive .gf-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.gf-archive table {
+    width: 100%;
+    min-width: 920px;
+    margin: 0;
+}
+
+.gf-archive thead th {
+    padding: 11px 13px;
+    border-bottom: 1px solid var(--gf-border);
+    background: #f8fafc;
+    color: var(--gf-muted);
+    font-size: .63rem;
+    font-weight: 800;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.gf-archive tbody td {
+    padding: 13px;
+    border-color: #edf0f5;
+    color: #46536a;
+    font-size: .77rem;
+    vertical-align: middle;
+}
+
+.gf-archive tbody tr {
+    transition: background .16s ease;
+}
+
+.gf-archive tbody tr:hover {
+    background: #fbfdff;
+}
+
+.gf-archive .row-number {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: var(--gf-muted);
+    background: #f3f6fa;
+    font-size: .68rem;
+    font-weight: 750;
+}
+
+.gf-archive .member-name {
+    color: var(--gf-text);
+    font-size: .8rem;
+    font-weight: 750;
+}
+
+.gf-archive .member-date {
+    color: #44516a;
+    font-weight: 650;
+}
+
+.gf-archive .member-time,
+.gf-archive .muted-detail {
+    color: var(--gf-muted);
+    font-size: .67rem;
+}
+
+.gf-archive .phone-cell {
+    color: #56647b;
+    white-space: nowrap;
+}
+
+.gf-archive .status-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 27px;
+    padding: 4px 10px;
+    border: 1px solid #ffd7d7;
+    border-radius: 999px;
+    color: var(--gf-danger);
+    background: var(--gf-danger-soft);
+    font-size: .64rem;
+    font-weight: 800;
+}
+
+.gf-archive .restore-btn {
+    min-height: 34px;
+    padding: 0 11px;
+    border: 1px solid #ccebdc;
+    border-radius: 9px;
+    color: var(--gf-success);
+    background: var(--gf-success-soft);
+    font-size: .7rem;
+    font-weight: 750;
+    transition: all .18s ease;
+}
+
+.gf-archive .restore-btn:hover {
+    color: #fff;
+    background: var(--gf-success);
+    border-color: var(--gf-success);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(22,132,91,.18);
+}
+
+/* Empty */
+.gf-archive .empty-state {
+    padding: 52px 20px !important;
+    text-align: center;
+}
+
+.gf-archive .empty-icon {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    color: var(--gf-muted);
+    background: #f3f6fa;
+    font-size: 1.2rem;
+}
+
+.gf-archive .empty-title {
+    color: #4b5870;
+    font-size: .83rem;
+    font-weight: 700;
+}
+
+.gf-archive .empty-copy {
+    margin-top: 3px;
+    color: var(--gf-muted);
+    font-size: .72rem;
+}
+
+/* Pagination */
+.gf-archive .pagination {
+    gap: 4px;
+}
+
+.gf-archive .page-link {
+    min-width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    border: 1px solid var(--gf-border);
+    border-radius: 8px !important;
+    color: #62718a;
+    background: #fff;
+    font-size: .7rem;
+    font-weight: 700;
+}
+
+.gf-archive .page-link:hover {
+    color: var(--gf-primary);
+    background: var(--gf-primary-soft);
+    border-color: #cddcf7;
+}
+
+.gf-archive .page-item.active .page-link {
+    color: #fff;
+    background: var(--gf-primary);
+    border-color: var(--gf-primary);
+}
+
+/* Alerts */
+.gf-archive > .container-fluid > .alert {
+    border: 0;
+    border-radius: 11px;
+    font-size: .78rem;
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    .gf-archive .container-fluid {
+        padding-top: 16px !important;
+    }
+
+    .gf-archive .gf-header-body {
+        padding: 17px;
+    }
+
+    .gf-archive .gf-title {
+        font-size: 1.24rem;
+    }
+
+    .gf-archive .gf-back-btn {
+        width: 100%;
+    }
+
+    .gf-archive .gf-filter-card .card-body {
+        padding: 15px;
+    }
+
+    .gf-archive .gf-directory-head {
+        padding: 15px;
+    }
+
+    .gf-archive table {
+        min-width: 900px;
+    }
+
+    .gf-archive .pagination {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+</style>
+
+<div class="gf-archive">
+  <div class="container-fluid px-3 px-lg-4 py-3">
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm"
+         role="alert">
+      <i class="bi bi-info-circle me-1"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- Page Header -->
+    <div class="card gf-page-header mb-3">
+      <div class="gf-header-body">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+          <div class="d-flex align-items-center gap-3">
+            <span class="gf-title-icon">
+              <i class="bi bi-archive-fill"></i>
+            </span>
+            <div>
+              <div class="gf-eyebrow">Member records</div>
+              <h1 class="gf-title">Archived Members</h1>
+              <p class="gf-subtitle">View, search and restore archived gym members.</p>
+            </div>
+          </div>
+
+          <a href="{% url 'member_list' %}" class="btn btn-outline-primary gf-back-btn">
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to Members
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="card gf-filter-card mb-3">
+      <div class="card-body">
+        <div class="gf-section-title">
+          <span class="gf-section-icon"><i class="bi bi-funnel"></i></span>
+          Search &amp; Filter
+        </div>
+
+        <form method="get">
+          <div class="row g-3 align-items-end">
+
+            <div class="col-12 col-md-4">
+              <label class="form-label">Search Member</label>
+              <input type="text"
+                     name="q"
+                     value="{{ q }}"
+                     class="form-control"
+                     placeholder="Search member name or phone">
+            </div>
+
+            <div class="col-12 col-md-3">
+              <label class="form-label">Month</label>
+              <select name="month" class="form-select">
+                <option value="">All Months</option>
+                <option value="1" {% if month == "1" %}selected{% endif %}>January</option>
+                <option value="2" {% if month == "2" %}selected{% endif %}>February</option>
+                <option value="3" {% if month == "3" %}selected{% endif %}>March</option>
+                <option value="4" {% if month == "4" %}selected{% endif %}>April</option>
+                <option value="5" {% if month == "5" %}selected{% endif %}>May</option>
+                <option value="6" {% if month == "6" %}selected{% endif %}>June</option>
+                <option value="7" {% if month == "7" %}selected{% endif %}>July</option>
+                <option value="8" {% if month == "8" %}selected{% endif %}>August</option>
+                <option value="9" {% if month == "9" %}selected{% endif %}>September</option>
+                <option value="10" {% if month == "10" %}selected{% endif %}>October</option>
+                <option value="11" {% if month == "11" %}selected{% endif %}>November</option>
+                <option value="12" {% if month == "12" %}selected{% endif %}>December</option>
+              </select>
+            </div>
+
+            <div class="col-12 col-md-3">
+              <label class="form-label">Year</label>
+              <select name="year" class="form-select">
+                <option value="">All Years</option>
+                {% for y in years %}
+                <option value="{{ y.year }}" {% if year == y.year|stringformat:"s" %}selected{% endif %}>
+                  {{ y.year }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-12 col-md-2 d-flex gap-2">
+              <button type="submit" class="btn btn-primary filter-btn w-100">
+                <i class="bi bi-funnel me-1"></i>Filter
+              </button>
+              <a href="{% url 'archived_members' %}" class="btn btn-light border reset-btn w-100">
+                Reset
+              </a>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Directory -->
+    <div class="card gf-directory-card">
+      <div class="gf-directory-head">
+        <div>
+          <h2 class="gf-directory-title">
+            <i class="bi bi-person-lines-fill me-2 text-primary"></i>Archived Directory
+          </h2>
+          <div class="gf-directory-meta">Review archived records and restore members when required.</div>
+        </div>
+
+        <span class="badge rounded-pill border gf-count px-3 py-2">
+          {{ members.paginator.count|default:members|length }} Records
+        </span>
+      </div>
+
+      <div class="gf-table-wrap">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Archived Date</th>
+              <th>Member</th>
+              <th>Phone</th>
+              <th>Plan</th>
+              <th>Expiry Date</th>
+              <th>Branch</th>
+              <th>Status</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for member in members %}
+            <tr>
+              <td>
+                <span class="row-number">{{ forloop.counter }}</span>
+              </td>
+
+              <td>
+                {% if member.created_at %}
+                  <div class="member-date">{{ member.created_at|date:"Y-m-d" }}</div>
+                  <div class="member-time">{{ member.created_at|date:"h:i A" }}</div>
+                {% else %}
+                  <span class="muted-detail">-</span>
+                {% endif %}
+              </td>
+
+              <td>
+                <div class="member-name">{{ member.name }}</div>
+              </td>
+
+              <td class="phone-cell">
+                <i class="bi bi-telephone me-1"></i>{{ member.phone|default:"-" }}
+              </td>
+
+              <td>{{ member.plan.name|default:"-" }}</td>
+
+              <td>
+                {% if member.expiry_date %}
+                  {{ member.expiry_date|date:"d-m-Y" }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+
+              <td>{{ member.branch.name|default:"-" }}</td>
+
+              <td>
+                <span class="status-pill">
+                  <i class="bi bi-archive me-1"></i>Archived
+                </span>
+              </td>
+
+              <td class="text-end">
+                <a href="{% url 'restore_member' member.id %}"
+                   class="btn btn-success btn-sm restore-btn">
+                  <i class="bi bi-arrow-counterclockwise me-1"></i>Restore
+                </a>
+              </td>
+            </tr>
+
+            {% empty %}
+            <tr>
+              <td colspan="9" class="empty-state">
+                <div class="empty-icon"><i class="bi bi-archive"></i></div>
+                <div class="empty-title">No archived members found</div>
+                <div class="empty-copy">Try changing the filter or search criteria.</div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if members.has_other_pages %}
+      <div class="d-flex justify-content-end px-3 px-md-4 py-3 border-top">
+        <nav>
+          <ul class="pagination mb-0">
+
+            {% if members.has_previous %}
+            <li class="page-item">
+              <a class="page-link"
+                 href="?q={{ q }}&month={{ month }}&year={{ year }}&page={{ members.previous_page_number }}">
+                <i class="bi bi-chevron-left me-1"></i>Previous
+              </a>
+            </li>
+            {% endif %}
+
+            {% for num in members.paginator.page_range %}
+              {% if members.number == num %}
+              <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+              </li>
+              {% else %}
+              <li class="page-item">
+                <a class="page-link"
+                   href="?q={{ q }}&month={{ month }}&year={{ year }}&page={{ num }}">
+                  {{ num }}
+                </a>
+              </li>
+              {% endif %}
+            {% endfor %}
+
+            {% if members.has_next %}
+            <li class="page-item">
+              <a class="page-link"
+                 href="?q={{ q }}&month={{ month }}&year={{ year }}&page={{ members.next_page_number }}">
+                Next<i class="bi bi-chevron-right ms-1"></i>
+              </a>
+            </li>
+            {% endif %}
+
+          </ul>
+        </nav>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        setTimeout(function () {
+            $(".alert").slideUp("slow", function () {
+                $(this).alert('close');   // fully remove from DOM
+            });
+        }, 3000); // 5000ms = 5 sec
+
+    });
+</script>
+{% endblock %}

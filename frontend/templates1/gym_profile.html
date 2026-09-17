@@ -1,0 +1,1177 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid py-2 py-md-3 gf-profile-page">
+
+<style>
+  .gf-profile-page {
+    --gf-primary: #2f6fed;
+    --gf-primary-dark: #245bd0;
+    --gf-primary-soft: #edf4ff;
+    --gf-page: #f4f7fb;
+    --gf-border: #e4e9f2;
+    --gf-text: #172033;
+    --gf-muted: #7d8aa5;
+    --gf-warning: #b27b00;
+    --gf-warning-soft: #fff6dc;
+    --gf-danger: #d44949;
+    --gf-danger-soft: #fff0f0;
+    --gf-success: #16845b;
+    --gf-success-soft: #ebf4f2;
+    --gf-shadow: 0 8px 24px rgba(25,45,80,.06);
+    color: var(--gf-text);
+  }
+
+  .gf-profile-page .gf-card {
+    background: #fff;
+    border: 1px solid var(--gf-border);
+    border-radius: 16px;
+    box-shadow: var(--gf-shadow);
+  }
+
+  .gf-profile-header {
+    padding: 22px 24px;
+  }
+
+  .gf-eyebrow {
+    color: var(--gf-primary);
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .gf-title {
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    margin: 0;
+  }
+
+  .gf-subtitle {
+    color: var(--gf-muted);
+    font-size: .86rem;
+    margin: 5px 0 0;
+  }
+
+  .gf-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .gf-gym-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--gf-primary-soft);
+    border: 1px solid #dce8ff;
+    color: var(--gf-primary);
+    border-radius: 10px;
+    padding: 9px 12px;
+    font-size: .78rem;
+    font-weight: 800;
+  }
+
+  .gf-action {
+    border-radius: 10px !important;
+    font-weight: 700;
+    padding: 9px 13px;
+  }
+
+  .gf-section-card {
+    padding: 19px 20px;
+    height: 100%;
+  }
+
+  .gf-section-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 15px;
+  }
+
+  .gf-section-title {
+    font-size: .98rem;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .gf-section-subtitle {
+    color: var(--gf-muted);
+    font-size: .78rem;
+    margin: 4px 0 0;
+  }
+
+  .gf-section-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gf-primary-soft);
+    color: var(--gf-primary);
+    font-size: 1.05rem;
+    flex: 0 0 42px;
+  }
+
+  .gf-section-icon.warning {
+    background: var(--gf-warning-soft);
+    color: var(--gf-warning);
+  }
+
+  .gf-section-icon.success {
+    background: var(--gf-success-soft);
+    color: var(--gf-success);
+  }
+
+  .gf-section-icon.danger {
+    background: var(--gf-danger-soft);
+    color: var(--gf-danger);
+  }
+
+  .gf-divider {
+    border: 0;
+    border-top: 1px solid var(--gf-border);
+    margin: 0 0 16px;
+    opacity: 1;
+  }
+
+  .gf-profile-page .form-control,
+  .gf-profile-page .form-select {
+    min-height: 42px;
+    border-color: var(--gf-border);
+    border-radius: 10px;
+    font-size: .84rem;
+    box-shadow: none;
+  }
+
+  .gf-profile-page .form-control:focus,
+  .gf-profile-page .form-select:focus {
+    border-color: var(--gf-primary);
+    box-shadow: 0 0 0 3px rgba(47,111,237,.10);
+  }
+
+  .gf-label {
+    color: #65718a;
+    font-size: .72rem;
+    font-weight: 800;
+    margin: 0 0 6px 2px;
+  }
+
+  .gf-table-wrap {
+    overflow-x: auto;
+  }
+
+  .gf-table {
+    min-width: 760px;
+    margin: 0;
+  }
+
+  .gf-table thead th {
+    background: #f8faff;
+    color: #74809a;
+    border-bottom: 1px solid var(--gf-border);
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 12px 14px;
+  }
+
+  .gf-table tbody td {
+    color: #29344a;
+    border-color: #edf0f5;
+    font-size: .81rem;
+    padding: 13px 14px;
+    vertical-align: middle;
+  }
+
+  .gf-table tbody tr:hover {
+    background: #fbfcff;
+  }
+
+  .gf-branch-name,
+  .gf-trainer-name {
+    font-weight: 800;
+    color: var(--gf-text);
+  }
+
+  .gf-muted {
+    color: var(--gf-muted);
+  }
+
+  .gf-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: .69rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .gf-status.active {
+    background: var(--gf-success-soft);
+    color: var(--gf-success);
+    border: 1px solid #d3ece4;
+  }
+
+  .gf-status.inactive {
+    background: #f1f4f8;
+    color: #66738b;
+    border: 1px solid #e1e6ee;
+  }
+
+  .gf-table-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .gf-icon-btn {
+    width: 35px;
+    height: 35px;
+    padding: 0 !important;
+    border-radius: 9px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .gf-current {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 9px 12px;
+    color: #5e6a80;
+    font-size: .76rem;
+  }
+
+  .gf-current strong {
+    color: var(--gf-text);
+  }
+
+  .gf-upload-note {
+    color: var(--gf-muted);
+    font-size: .72rem;
+    margin-top: 7px;
+  }
+
+  .gf-alert {
+    border-radius: 12px;
+  }
+
+  .gf-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--gf-muted);
+  }
+
+  .gf-empty-icon {
+    width: 46px;
+    height: 46px;
+    margin: 0 auto 10px;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f4fa;
+    color: #91a0b9;
+  }
+
+  /* Modal polish */
+  .gf-profile-page + .modal .modal-content,
+  .gf-modal-content {
+    border: 1px solid var(--gf-border);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(15,23,42,.16);
+    overflow: hidden;
+  }
+
+  .gf-modal-content .modal-header,
+  .gf-modal-content .modal-footer {
+    border-color: #edf0f5;
+  }
+
+  .gf-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+  }
+
+  .gf-modal-title-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gf-primary-soft);
+    color: var(--gf-primary);
+  }
+
+  @media (max-width: 767.98px) {
+    .gf-profile-page {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+
+    .gf-profile-header {
+      padding: 18px;
+    }
+
+    .gf-title {
+      font-size: 1.22rem;
+    }
+
+    .gf-profile-header .gf-header-actions {
+      width: 100%;
+      justify-content: stretch;
+    }
+
+    .gf-profile-header .gf-header-actions > * {
+      flex: 1 1 100%;
+      justify-content: center;
+    }
+
+    .gf-section-card {
+      padding: 16px;
+    }
+
+    .gf-section-top {
+      align-items: flex-start;
+    }
+
+    .gf-section-top .btn {
+      flex: 0 0 auto;
+    }
+
+    .gf-table {
+      min-width: 720px;
+    }
+  }
+</style>
+
+<div id="alertArea" class="mb-3"></div>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm gf-alert mb-3" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<!-- Page Header -->
+<div class="gf-card gf-profile-header mb-3">
+  <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+    <div>
+      <div class="gf-eyebrow">
+        <i class="bi bi-building me-1"></i> Administration
+      </div>
+      <h1 class="gf-title">Gym Profile</h1>
+      <p class="gf-subtitle">Manage your gym profile, branches, trainers, and invoice settings.</p>
+    </div>
+
+    <div class="gf-header-actions">
+      <div class="gf-gym-chip">
+        <i class="bi bi-building"></i>
+        <span>{{ gym.name }}</span>
+      </div>
+
+      <a href="{% url 'download_full_backup' %}"
+         class="btn btn-primary btn-sm gf-action"
+         onclick="return confirm('Download full backup now?');">
+        <i class="bi bi-download me-1"></i> Backup
+      </a>
+
+      <button class="btn btn-warning btn-sm gf-action" data-bs-toggle="modal" data-bs-target="#ownerResetPwdModal">
+        <i class="bi bi-key me-1"></i> Change Password
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+
+  <!-- Branches -->
+  {% if request.user.gym.plan_type == "multi" %}
+  <div class="col-12">
+    <div class="gf-card gf-section-card">
+      <div class="gf-section-top">
+        <div class="d-flex align-items-center gap-3">
+          <div class="gf-section-icon">
+            <i class="bi bi-diagram-3"></i>
+          </div>
+          <div>
+            <h2 class="gf-section-title">Branches</h2>
+            <p class="gf-section-subtitle">Manage all branches under this gym.</p>
+          </div>
+        </div>
+
+        <button class="btn btn-outline-primary btn-sm gf-action"
+                data-bs-toggle="modal" data-bs-target="#addBranchModal">
+          <i class="bi bi-plus-lg me-1"></i> Add Branch
+        </button>
+      </div>
+
+      <hr class="gf-divider">
+
+      <div class="gf-table-wrap">
+        <table class="table gf-table table-hover align-middle">
+          <thead>
+            <tr>
+              <th style="width:70px;">#</th>
+              <th>Branch</th>
+              <th>Phone</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in branches %}
+            <tr>
+              <td class="gf-muted">{{ forloop.counter }}</td>
+              <td class="gf-branch-name">
+                <i class="bi bi-geo-alt me-1 text-primary"></i>{{ b.name }}
+              </td>
+              <td>{{ b.phone|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="3">
+                <div class="gf-empty">
+                  <div class="gf-empty-icon"><i class="bi bi-diagram-3"></i></div>
+                  <div class="fw-semibold text-dark">No branches added yet</div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Trainers -->
+  <div class="col-12">
+    <div class="gf-card gf-section-card">
+      <div class="gf-section-top">
+        <div class="d-flex align-items-center gap-3">
+          <div class="gf-section-icon success">
+            <i class="bi bi-person-badge"></i>
+          </div>
+          <div>
+            <h2 class="gf-section-title">Trainers</h2>
+            <p class="gf-section-subtitle">Create trainer accounts, assign branches, and control access.</p>
+          </div>
+        </div>
+
+        <button class="btn btn-outline-primary btn-sm gf-action"
+                data-bs-toggle="modal" data-bs-target="#addTrainerModal">
+          <i class="bi bi-plus-lg me-1"></i> Add Trainer
+        </button>
+      </div>
+
+      <hr class="gf-divider">
+
+      <div class="gf-table-wrap">
+        <table class="table gf-table align-middle">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Trainer</th>
+              <th>Username</th>
+              <th>Phone</th>
+              <th>Branch</th>
+              <th style="min-width:220px;">Assign</th>
+              <th>Status</th>
+              <th style="min-width:160px;">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for t in trainers %}
+            <tr>
+              <td class="gf-muted">{{ forloop.counter }}</td>
+
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="gf-section-icon" style="width:34px;height:34px;flex-basis:34px;font-size:.85rem;">
+                    <i class="bi bi-person-fill"></i>
+                  </div>
+                  <div class="gf-trainer-name">
+                    {% if t.first_name %}
+                      {{ t.first_name }}
+                    {% else %}
+                      {{ t.username }}
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+
+              <td>{{ t.username }}</td>
+              <td>{{ t.phone|default:"-" }}</td>
+
+              <td>
+                {% if t.branch %}
+                  <span class="fw-semibold">{{ t.branch.name }}</span>
+                {% else %}
+                  <span class="gf-muted">No branch</span>
+                {% endif %}
+              </td>
+
+              <td>
+                <select class="form-select form-select-sm trainer-branch py-2"
+                        data-trainer-id="{{ t.id }}">
+                  <option value="">No branch</option>
+                  {% for b in branches %}
+                    <option value="{{ b.id }}" {% if t.branch_id == b.id %}selected{% endif %}>
+                      {{ b.name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </td>
+
+              <td>
+                {% if t.is_active %}
+                  <span class="gf-status active">
+                    <i class="bi bi-check-circle-fill"></i> Active
+                  </span>
+                {% else %}
+                  <span class="gf-status inactive">
+                    <i class="bi bi-dash-circle"></i> Inactive
+                  </span>
+                {% endif %}
+              </td>
+
+              <td>
+                <div class="gf-table-actions">
+                  <button type="button"
+                          class="btn btn-outline-warning btn-sm gf-icon-btn"
+                          onclick="toggleTrainer('{{ t.id }}')"
+                          title="{% if t.is_active %}Deactivate{% else %}Activate{% endif %}">
+                    {% if t.is_active %}
+                      <i class="bi bi-pause-circle"></i>
+                    {% else %}
+                      <i class="bi bi-play-circle"></i>
+                    {% endif %}
+                  </button>
+
+                  <button class="btn btn-warning btn-sm gf-icon-btn"
+                          onclick="openResetPassword('{{ t.id }}')"
+                          title="Reset Password">
+                    <i class="bi bi-key"></i>
+                  </button>
+
+                  <button type="button"
+                          class="btn btn-outline-danger btn-sm gf-icon-btn"
+                          onclick="deleteTrainer('{{ t.id }}')"
+                          title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            {% empty %}
+            <tr>
+              <td colspan="8">
+                <div class="gf-empty">
+                  <div class="gf-empty-icon"><i class="bi bi-person-badge"></i></div>
+                  <div class="fw-semibold text-dark">No trainers found</div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Invoice Settings -->
+  <div class="col-12 col-xl-6">
+    <div class="gf-card gf-section-card">
+      <div class="gf-section-top">
+        <div class="d-flex align-items-center gap-3">
+          <div class="gf-section-icon">
+            <i class="bi bi-receipt"></i>
+          </div>
+          <div>
+            <h2 class="gf-section-title">Invoice Settings</h2>
+            <p class="gf-section-subtitle">Set your invoice prefix, running number, and padding format.</p>
+          </div>
+        </div>
+      </div>
+
+      <hr class="gf-divider">
+
+      <form method="post" action="{% url 'invoice_settings' %}">
+        {% csrf_token %}
+
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="gf-label">Prefix</label>
+            <input class="form-control" name="prefix" value="{{ settings.prefix }}" required>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label class="gf-label">Next Invoice Number</label>
+            <input class="form-control" type="number" name="next_number" value="{{ settings.next_number }}" required>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label class="gf-label">Padding (digits)</label>
+            <input class="form-control" type="number" name="padding" value="{{ settings.padding }}" required>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4">
+          <button class="btn btn-primary btn-sm gf-action px-4">Save Settings</button>
+
+          <div class="gf-current">
+            <i class="bi bi-hash text-primary"></i>
+            Current Invoice:
+            <strong>{{ invoice_setting.prefix }}-{{ invoice_setting.next_number|stringformat:"04d" }}</strong>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bulk Upload -->
+  <div class="col-12 col-xl-6">
+    <div class="gf-card gf-section-card">
+      <div class="gf-section-top">
+        <div class="d-flex align-items-center gap-3">
+          <div class="gf-section-icon success">
+            <i class="bi bi-file-earmark-spreadsheet"></i>
+          </div>
+          <div>
+            <h2 class="gf-section-title">Bulk Upload</h2>
+            <p class="gf-section-subtitle">Import customer data sets from Excel.</p>
+          </div>
+        </div>
+      </div>
+
+      <hr class="gf-divider">
+
+      <form method="post"
+            action="{% url 'preview_members_excel' %}"
+            enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <label class="gf-label">Excel File</label>
+        <input type="file" class="form-control" name="excel_file"
+               accept=".xlsx,.xls" required>
+        <div class="gf-upload-note">
+          <i class="bi bi-info-circle me-1"></i> Accepted formats: .xlsx and .xls
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-sm gf-action px-4 mt-3">
+          <i class="bi bi-cloud-arrow-up me-1"></i> Upload Excel
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admission Number -->
+  <div class="col-12">
+    <div class="gf-card gf-section-card">
+      <div class="gf-section-top">
+        <div class="d-flex align-items-center gap-3">
+          <div class="gf-section-icon warning">
+            <i class="bi bi-person-vcard"></i>
+          </div>
+          <div>
+            <h2 class="gf-section-title">Admission Number</h2>
+            <p class="gf-section-subtitle">Set the number where new member admission numbering should start.</p>
+          </div>
+        </div>
+      </div>
+
+      <hr class="gf-divider">
+
+      <form method="post"
+            action="{% url 'update_admission_settings' %}"
+            enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-md-4">
+            <label class="gf-label">Starting Admission Number</label>
+            <input type="number" class="form-control"
+                   name="admission_start_number"
+                   value="{{ gym.admission_start_number }}">
+          </div>
+
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary btn-sm gf-action px-4">
+              <i class="bi bi-check2-circle me-1"></i> Save Admission Number
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- OWNER PASSWORD MODAL -->
+<div class="modal fade" id="ownerResetPwdModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content gf-modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title gf-modal-title"><span class="gf-modal-title-icon"><i class="bi bi-key"></i></span>Change Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label small text-muted">New Password</label>
+                    <input type="password" id="op_new_password" class="form-control" minlength="6"
+                           placeholder="Enter new password (min 6 chars)">
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label small text-muted">Confirm Password</label>
+                    <input type="password" id="op_confirm_password" class="form-control" minlength="6"
+                           placeholder="Confirm new password">
+                </div>
+
+                <div class="alert alert-danger d-none mt-3" id="op_error"></div>
+                <div class="alert alert-success d-none mt-3" id="op_success">Password updated ✅</div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="op_save_btn">Save</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- STAFF PASSWORD MODAL -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content gf-modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title gf-modal-title"><span class="gf-modal-title-icon"><i class="bi bi-shield-lock"></i></span>Reset Password</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="reset_user_id">
+
+                <label class="form-label">New Password</label>
+                <input type="password" id="new_password" class="form-control" placeholder="Enter new password">
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="submitPasswordReset()">
+                    Reset Password
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Add Branch Modal -->
+<div class="modal fade" id="addBranchModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content gf-modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title gf-modal-title"><span class="gf-modal-title-icon"><i class="bi bi-diagram-3"></i></span>Add Branch</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="addBranchForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Branch Name *</label>
+                        <input class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input class="form-control" name="phone" maxlength="10">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Address</label>
+                        <textarea class="form-control" name="address" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="submit">Save</button>
+                    <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- Add Trainer Modal -->
+<div class="modal fade" id="addTrainerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content gf-modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title gf-modal-title"><span class="gf-modal-title-icon"><i class="bi bi-person-plus"></i></span>Add Trainer</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="addTrainerForm">
+                <div class="modal-body">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Trainer Name *</label>
+                            <input class="form-control" name="name" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            <input class="form-control" name="phone" placeholder="optional"  maxlength="10">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label class="form-label">Username *</label>
+                            <input class="form-control" name="username" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Password *</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label">Assign Branch (optional)</label>
+                        <select class="form-select" name="branch_id">
+                            <option value="">Select branch</option>
+                            {% for b in branches %}
+                                <option value="{{ b.id }}">{{ b.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="alert alert-info small mt-3 mb-0">
+                        Trainer login will be created using username & password.
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="submit">Save</button>
+                    <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- Edit Trainer Modal -->
+<div class="modal fade" id="editTrainerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content gf-modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title gf-modal-title"><span class="gf-modal-title-icon"><i class="bi bi-person-gear"></i></span>Edit Trainer</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="editTrainerForm">
+                <div class="modal-body">
+
+                    <input type="hidden" id="edit_trainer_id" name="trainer_id">
+
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" id="edit_name" name="name" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" id="edit_username" name="username" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="text" id="edit_phone" name="phone" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Branch</label>
+                        <select id="edit_branch" name="branch_id" class="form-select">
+                            <option value="">No branch</option>
+                            {% for b in branches %}
+                                <option value="{{ b.id }}">{{ b.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="edit_active" name="is_active">
+                        <label class="form-check-label">Active</label>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#op_save_btn").on("click", function () {
+        const pw = $("#op_new_password").val().trim();
+        const cpw = $("#op_confirm_password").val().trim();
+        const csrf = $("input[name=csrfmiddlewaretoken]").val();
+
+        $("#op_error").addClass("d-none").text("");
+        $("#op_success").addClass("d-none");
+
+        if (!pw || !cpw) {
+            $("#op_error").removeClass("d-none").text("Please enter both password fields");
+            return;
+        }
+
+        if (pw.length < 6) {
+            $("#op_error").removeClass("d-none").text("Password must be at least 6 characters");
+            return;
+        }
+
+        if (pw !== cpw) {
+            $("#op_error").removeClass("d-none").text("New Password and Confirm Password must match");
+            $("#op_confirm_password").addClass("is-invalid");
+            return;
+        } else {
+            $("#op_confirm_password").removeClass("is-invalid");
+        }
+
+        $.ajax({
+            url: "{% url 'owner_reset_password' %}",
+            type: "POST",
+            data: {
+                password: pw,
+                confirm_password: cpw,
+                csrfmiddlewaretoken: csrf
+            },
+            success: function (res) {
+                if (res.success) {
+                    $("#op_success").removeClass("d-none").text("Password updated successfully");
+                    setTimeout(() => {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById("ownerResetPwdModal"));
+                        if (modal) modal.hide();
+                        window.location.reload();
+                    }, 800);
+                } else {
+                    $("#op_error").removeClass("d-none").text(res.error || "Failed");
+                }
+            },
+            error: function (xhr) {
+                $("#op_error").removeClass("d-none").text(xhr.responseJSON?.error || "Failed");
+            }
+        });
+    });
+
+    function openResetPassword(userId) {
+        $("#reset_user_id").val(userId);
+        new bootstrap.Modal(document.getElementById("resetPasswordModal")).show();
+    }
+
+    function submitPasswordReset() {
+        const userId = $("#reset_user_id").val();
+        const password = $("#new_password").val();
+
+        $.ajax({
+            url: `/users/${userId}/reset-password/`,
+            type: "POST",
+            data: {
+                password: password,
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
+            },
+            success: function(res){
+                if(res.success){
+                    alert("Password reset successfully");
+                    location.reload();
+                } else {
+                    alert(res.error);
+                }
+            }
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie("csrftoken");
+
+    $("#addBranchForm").on("submit", function(e){
+        e.preventDefault();
+
+        $.ajax({
+            url: "{% url 'create_branch' %}",
+            type: "POST",
+            data: $(this).serialize(),
+            headers: {"X-CSRFToken": csrftoken},
+            success: function(res){
+                if (res.success) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById("addBranchModal"));
+                    modal.hide();
+                    $("#addBranchForm")[0].reset();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    showAlert("Branch created successfully ✅", "success");
+                    setTimeout(function(){
+                        location.reload();
+                    }, 1000);
+                } else {
+                    showAlert(res.message || "Error", "danger");
+                }
+            }
+        });
+    });
+
+    $("#addTrainerForm").on("submit", function(e){
+        e.preventDefault();
+
+        $.ajax({
+            url: "{% url 'create_trainer' %}",
+            type: "POST",
+            data: $(this).serialize(),
+            headers: {"X-CSRFToken": csrftoken},
+            success: function(res){
+                if (res.success) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById("addTrainerModal"));
+                    modal.hide();
+                    $("#addTrainerForm")[0].reset();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    showAlert("Trainer created successfully ✅", "success");
+                    setTimeout(function(){
+                        location.reload();
+                    }, 2000);
+                } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    showAlert(res.message || "Error", "danger");
+                }
+            }
+        });
+    });
+
+    $(".trainer-branch").on("change", function(){
+        const trainerId = $(this).data("trainer-id");
+        const branchId = $(this).val();
+
+        $.ajax({
+            url: `/profile/trainer/${trainerId}/assign-branch/`,
+            type: "POST",
+            data: {branch_id: branchId},
+            headers: {"X-CSRFToken": csrftoken},
+            success: function(res){
+                if(!res.success) {
+                    alert(res.message || "Failed to assign");
+                } else {
+                    location.reload();
+                }
+            }
+        });
+    });
+
+    function showAlert(message, type="success") {
+        const alertHtml = `
+          <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        `;
+        $("#alertArea").html(alertHtml);
+
+        setTimeout(function () {
+            $(".alert").slideUp("slow", function () {
+                $(this).alert('close');
+            });
+        }, 4000);
+    }
+
+    function toggleTrainer(trainerId){
+        $.ajax({
+            url: `/profile/trainer/${trainerId}/toggle/`,
+            type: "POST",
+            headers: {"X-CSRFToken": csrftoken},
+            success: function(res){
+                if(res.success){
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    showAlert("Trainer status updated ✅", "success");
+                    setTimeout(()=>location.reload(), 1500);
+                } else {
+                    showAlert(res.message || "Error", "danger");
+                }
+            }
+        });
+    }
+
+    function deleteTrainer(trainerId){
+        if(!confirm("Delete this trainer once deleted no retrieve !!")) return;
+
+        $.ajax({
+            url: `/profile/trainer/${trainerId}/delete/`,
+            type: "POST",
+            headers: {"X-CSRFToken": csrftoken},
+            success: function(res){
+                if(res.success){
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    showAlert("Trainer deleted ✅", "success");
+                    setTimeout(()=>location.reload(), 1500);
+                } else {
+                    showAlert(res.message || "Error", "danger");
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,232 @@
+.form-control:focus,
+.form-select:focus {
+    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, .15);
+    border-color: #86b7fe;
+}
+
+.member-photo-card {
+    border: 1px solid #e9edf3;
+    border-radius: 22px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+    padding: 24px;
+}
+
+.member-photo-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #5b6b82;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    margin-bottom: 20px;
+}
+
+.photo-upload-wrap {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    flex-wrap: wrap;
+}
+
+.photo-left {
+    width: 170px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.photo-avatar-box {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+}
+
+.photo-avatar-box img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    box-shadow:
+        0 10px 24px rgba(13, 110, 253, 0.12),
+        0 2px 8px rgba(15, 23, 42, 0.08);
+    background: #f8fafc;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: block;
+}
+
+.photo-avatar-box img:hover {
+    transform: scale(1.02);
+    box-shadow:
+        0 14px 30px rgba(13, 110, 253, 0.16),
+        0 4px 12px rgba(15, 23, 42, 0.10);
+}
+
+.photo-camera-btn {
+    position: absolute;
+    right: 4px;
+    bottom: 6px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 18px rgba(13, 110, 253, 0.28);
+    transition: transform 0.2s ease;
+    padding: 0;
+}
+
+.photo-camera-btn:hover {
+    transform: translateY(-1px) scale(1.04);
+}
+
+.photo-info {
+    min-width: 280px;
+    flex: 1;
+}
+
+.photo-info h6 {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 6px;
+    color: #1f2937;
+}
+
+.photo-info p {
+    margin-bottom: 14px;
+    color: #6b7280;
+    font-size: 14px;
+    max-width: 700px;
+}
+
+.photo-badge-list {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.photo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: #f3f7ff;
+    color: #2457d6;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid #e2ebff;
+}
+
+.dob-input {
+    max-width: 360px;
+}
+
+.dob-input input {
+    border-radius: 12px;
+    border: 1px solid #e4e8ef;
+    padding: 10px 12px;
+    font-size: 14px;
+    height: 46px;
+}
+
+.dob-input input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 .15rem rgba(13,110,253,.15);
+}
+
+.camera-panel {
+    display: none;
+    margin-top: 22px;
+    border: 1px solid #e9edf3;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
+}
+
+.camera-panel-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid #eef2f7;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fbfcff;
+}
+
+.camera-panel-header h6 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #334155;
+}
+
+.camera-panel-body {
+    padding: 16px;
+}
+
+.camera-video-wrap {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 10px;
+    display: inline-block;
+}
+
+#video {
+    width: 100%;
+    max-width: 360px;
+    height: auto;
+    border-radius: 14px;
+    display: block;
+    background: #000;
+}
+
+.camera-actions {
+    margin-top: 14px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.camera-actions .btn {
+    min-width: 110px;
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 9px 16px;
+}
+
+@media (max-width: 768px) {
+    .member-photo-card {
+        padding: 18px;
+    }
+
+    .photo-upload-wrap {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .photo-left {
+        width: 100%;
+    }
+
+    .photo-info {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    .photo-badge-list {
+        justify-content: center;
+    }
+
+    .dob-input {
+        max-width: 100%;
+        text-align: left;
+    }
+}
+
