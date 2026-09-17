@@ -2493,7 +2493,7 @@ def whatsapp_conf(request):
         gym.Auto_archive_enable=Auto_archive_enable
         gym.wa_template_birthday =wa_template_birthday
         gym.wa_template_birthday_today=wa_template_birthday_today
-        gym.expiry_reminder_days_before=birthday_reminder_days_before
+        gym.birthday_reminder_days_before=birthday_reminder_days_before
         
         gym.save(update_fields=[
             "interakt_enabled",
