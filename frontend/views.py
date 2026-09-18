@@ -483,124 +483,282 @@ def _to_decimal(value, default="0"):
 def Add_members(request):
     gym = request.user.gym
 
+    # ==========================================================
+    # GET
+    # ==========================================================
     if request.method == "GET":
-        branches = Branch.objects.filter(gym=gym).values("name", "id")
-        return render(request, "Add_members.html", {"branches": branches})
-    # -------------------------
+
+        if request.user.role == "TRAINER":
+
+            # Trainer must have an assigned branch
+            if not request.user.branch_id:
+                messages.error(
+                    request,
+                    "No branch has been assigned to your trainer account."
+                )
+                return redirect("member_list")
+
+            # Trainer sees ONLY their assigned branch
+            branches = Branch.objects.filter(
+                gym=gym,
+                id=request.user.branch_id
+            ).values("name", "id")
+
+        else:
+            # ADMIN → all branches
+            branches = Branch.objects.filter(
+                gym=gym
+            ).values("name", "id")
+
+        return render(
+            request,
+            "Add_members.html",
+            {
+                "branches": branches
+            }
+        )
+
+    # ==========================================================
     # POST DATA
-    # -------------------------
+    # ==========================================================
     name = (request.POST.get("name") or "").strip()
     phone = (request.POST.get("phone") or "").strip()
     branch_id = request.POST.get("branch")
     plan_id = request.POST.get("plan")
 
-    dob = request.POST.get("date_of_birth")  # safer naming
+    dob = request.POST.get("date_of_birth")
     join_date_str = request.POST.get("join_date")
     start_date_str = request.POST.get("Start_date")
 
-    payment_method = (request.POST.get("Payment_method") or "").strip()
+    payment_method = (
+        request.POST.get("Payment_method") or ""
+    ).strip()
 
     paid_amount_raw = request.POST.get("paid_amount")
-    paid_amount = _to_decimal(paid_amount_raw, default="0")
+    paid_amount = _to_decimal(
+        paid_amount_raw,
+        default="0"
+    )
 
-    discount_amount = _to_decimal(request.POST.get("discount_amount"), default="0")
-    discount_reason = (request.POST.get("discount_reason") or "").strip()
-    referral_name = (request.POST.get("referral_name") or "").strip()
+    discount_amount = _to_decimal(
+        request.POST.get("discount_amount"),
+        default="0"
+    )
 
-    advance_amount = _to_decimal(request.POST.get("security_deposit"), default="0")
+    discount_reason = (
+        request.POST.get("discount_reason") or ""
+    ).strip()
 
-    # -------------------------
-    # VALIDATIONS
-    # -------------------------
-    branch = get_object_or_404(Branch, id=branch_id, gym=gym)
-    plan = get_object_or_404(MembershipPlan, id=plan_id, branch=branch, is_active=True)
+    referral_name = (
+        request.POST.get("referral_name") or ""
+    ).strip()
 
-    # Dates
+    advance_amount = _to_decimal(
+        request.POST.get("security_deposit"),
+        default="0"
+    )
+
+    # ==========================================================
+    # 🔐 BRANCH ACCESS CONTROL
+    # ==========================================================
+
+    if request.user.role == "TRAINER":
+
+        # Trainer must have an assigned branch
+        if not request.user.branch_id:
+            messages.error(
+                request,
+                "No branch has been assigned to your trainer account."
+            )
+            return redirect("member_list")
+
+        # Ignore the branch sent by frontend
+        # and FORCE trainer's assigned branch
+        branch_id = request.user.branch_id
+
+    # ==========================================================
+    # VALIDATE BRANCH
+    # ==========================================================
+
+    branch = get_object_or_404(
+        Branch,
+        id=branch_id,
+        gym=gym
+    )
+
+    # ==========================================================
+    # VALIDATE PLAN
+    # ==========================================================
+
+    plan = get_object_or_404(
+        MembershipPlan,
+        id=plan_id,
+        branch=branch,
+        is_active=True
+    )
+
+    # ==========================================================
+    # DATES
+    # ==========================================================
+
     try:
-        join_date = datetime.strptime(join_date_str, "%Y-%m-%d").date()
+        join_date = datetime.strptime(
+            join_date_str,
+            "%Y-%m-%d"
+        ).date()
+
     except Exception:
-        messages.error(request, "Invalid Join Date")
+        messages.error(
+            request,
+            "Invalid Join Date"
+        )
         return redirect("Add_members")
 
     try:
-        start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date() if start_date_str else join_date
+        start_date = (
+            datetime.strptime(
+                start_date_str,
+                "%Y-%m-%d"
+            ).date()
+            if start_date_str
+            else join_date
+        )
+
     except Exception:
-        messages.error(request, "Invalid Start Date")
+        messages.error(
+            request,
+            "Invalid Start Date"
+        )
         return redirect("Add_members")
 
-    expiry_date = start_date + timedelta(days=plan.duration_days - 1)
+    expiry_date = (
+        start_date +
+        timedelta(days=plan.duration_days - 1)
+    )
 
-    # Duplicate phone
-    if Member.objects.filter(gym=gym, phone=phone).exists():
-        messages.error(request, "Phone number already exists!")
+    # ==========================================================
+    # DUPLICATE PHONE
+    # ==========================================================
+
+    if Member.objects.filter(
+        gym=gym,
+        phone=phone
+    ).exists():
+
+        messages.error(
+            request,
+            "Phone number already exists!"
+        )
         return redirect("Add_members")
 
-    # -------------------------
-    # PHOTO HANDLING (UPDATED)
-    # -------------------------
+    # ==========================================================
+    # PHOTO HANDLING
+    # ==========================================================
+
     photo_file = None
-    photo = request.FILES.get("photo")   # ✅ direct file
+
+    photo = request.FILES.get("photo")
     photo_base64 = request.POST.get("captured_photo")
-    
+
     if photo:
-        # ✅ BEST: use file directly (fast + small size)
+
         photo_file = photo
-    
+
     elif photo_base64:
+
         try:
-            format, imgstr = photo_base64.split(";base64,")
+            format, imgstr = photo_base64.split(
+                ";base64,"
+            )
+
             ext = format.split("/")[-1]
-    
+
             photo_file = ContentFile(
                 base64.b64decode(imgstr),
                 name=f"member_{phone}.{ext}"
             )
+
         except Exception:
-            messages.error(request, "Invalid captured image")
+
+            messages.error(
+                request,
+                "Invalid captured image"
+            )
             return redirect("Add_members")
 
-    # -------------------------
+    # ==========================================================
     # FINANCIAL LOGIC
-    # -------------------------
+    # ==========================================================
+
     plan_price = Decimal(plan.price)
 
     if discount_amount < 0:
-        messages.error(request, "Discount cannot be negative")
+
+        messages.error(
+            request,
+            "Discount cannot be negative"
+        )
         return redirect("Add_members")
 
     if discount_amount > plan_price:
-        messages.error(request, "Discount exceeds plan price")
+
+        messages.error(
+            request,
+            "Discount exceeds plan price"
+        )
         return redirect("Add_members")
 
-    final_amount = plan_price - discount_amount
+    final_amount = (
+        plan_price -
+        discount_amount
+    )
 
-    # If empty → full payment
-    if paid_amount_raw in (None, "", "None"):
+    # Empty paid amount = full payment
+    if paid_amount_raw in (
+        None,
+        "",
+        "None"
+    ):
         paid_amount = final_amount
 
     if paid_amount < 0:
-        messages.error(request, "Paid amount cannot be negative")
+
+        messages.error(
+            request,
+            "Paid amount cannot be negative"
+        )
         return redirect("Add_members")
 
     if paid_amount > final_amount:
-        messages.error(request, "Paid exceeds final amount")
+
+        messages.error(
+            request,
+            "Paid exceeds final amount"
+        )
         return redirect("Add_members")
 
-    pending = final_amount - paid_amount
-    
-    
-    # ------------------------
-    # admission_number 
-    # ------------------------
+    pending = (
+        final_amount -
+        paid_amount
+    )
 
-    admission_number = request.POST.get("admission_number")
+    # ==========================================================
+    # ADMISSION NUMBER
+    # ==========================================================
+
+    admission_number = request.POST.get(
+        "admission_number"
+    )
 
     if not admission_number:
-        admission_number = generate_admission_number(gym)
+        admission_number = generate_admission_number(
+            gym
+        )
 
-    # -------------------------
+    # ==========================================================
     # CREATE MEMBER
-    # -------------------------
+    # ==========================================================
+
     member = Member.objects.create(
         gym=gym,
         admission_number=admission_number,
@@ -616,12 +774,14 @@ def Add_members(request):
         DOB=dob if dob else None
     )
 
-    # -------------------------
+    # ==========================================================
     # CREATE PAYMENT
-    # -------------------------
+    # ==========================================================
+
     inv = generate_invoice_number(gym)
 
     if paid_amount > 0:
+
         Payment.objects.create(
             gym=gym,
             member=member,
@@ -640,9 +800,10 @@ def Add_members(request):
             created_by=request.user,
         )
 
-    # -------------------------
+    # ==========================================================
     # WHATSAPP MESSAGE
-    # -------------------------
+    # ==========================================================
+
     msg = (
         f"Thank You for choosing {gym} 💪\n\n"
         f"Hello {member.name} 👋\n"
@@ -659,26 +820,47 @@ def Add_members(request):
         f"💼 Security Deposit: ₹{advance_amount}"
     )
 
-    whatsapp_url = f"https://wa.me/91{member.phone}?text={quote(msg)}"
+    whatsapp_url = (
+        f"https://wa.me/91{member.phone}"
+        f"?text={quote(msg)}"
+    )
 
     request.session["whatsapp_url"] = whatsapp_url
     request.session["invoice_id"] = inv
 
-    messages.success(request, "Member added successfully ✅")
+    messages.success(
+        request,
+        "Member added successfully ✅"
+    )
+
     return redirect("member_list")
 
 # For Getting the Baranch based Planes and Price.
 @login_required
 @owner_or_trainer
 def get_plan(request):
+    print("Im in")
     gym = request.user.gym
     branch_id = request.GET.get("branch_id")
+    print(request.user.role)
+    # Trainer can access only their assigned branch
+    if request.user.role == "TRAINER":
+        if not request.user.branch_id:
+            return JsonResponse([], safe=False)
 
+        branch_id = request.user.branch_id
+
+    # Admin can request any branch belonging to their gym
     plans = MembershipPlan.objects.filter(
         branch_id=branch_id,
         branch__gym=gym,
         is_active=True
-    ).values("id", "name", "price", "duration_days")
+    ).values(
+        "id",
+        "name",
+        "price",
+        "duration_days"
+    )
 
     return JsonResponse(list(plans), safe=False)
 
@@ -686,7 +868,7 @@ def get_plan(request):
 @login_required
 @owner_or_trainer
 def member_list(request):
-    
+
     whatsapp_url = request.session.pop("whatsapp_url", None)
     invoice_id = request.session.pop("invoice_id", None)
 
@@ -698,6 +880,9 @@ def member_list(request):
     branch = request.GET.get("branch", "")
     status = request.GET.get("status", "")
 
+    # ==========================================================
+    # BASE MEMBERS QUERY
+    # ==========================================================
     members = Member.objects.select_related(
         "branch", "plan"
     ).filter(
@@ -705,7 +890,28 @@ def member_list(request):
         is_deleted=False
     )
 
-    # 🔍 Search filter
+    # ==========================================================
+    # 🔐 TRAINER → ONLY ASSIGNED BRANCH
+    # ADMIN → ALL BRANCHES
+    # ==========================================================
+    if request.user.role == "TRAINER":
+
+        if request.user.branch_id:
+            members = members.filter(
+                branch_id=request.user.branch_id
+            )
+
+            # Force the branch filter to trainer's branch
+            branch = str(request.user.branch_id)
+
+        else:
+            # Trainer without assigned branch
+            members = members.none()
+            branch = ""
+
+    # ==========================================================
+    # 🔍 SEARCH FILTER
+    # ==========================================================
     if search:
         members = members.filter(
             Q(name__icontains=search) |
@@ -713,23 +919,61 @@ def member_list(request):
             Q(admission_number__icontains=search)
         )
 
-    # 🏢 Branch filter
+    # ==========================================================
+    # 🏢 BRANCH FILTER
+    # ADMIN → Can filter any branch
+    # TRAINER → Already restricted above
+    # ==========================================================
     if branch:
-        members = members.filter(branch__id=branch)
+        members = members.filter(
+            branch__id=branch
+        )
 
-    # 📊 Status filter
+    # ==========================================================
+    # 📊 STATUS FILTER
+    # ==========================================================
     if status:
-        members = members.filter(status__iexact=status)
+        members = members.filter(
+            status__iexact=status
+        )
 
+    # ==========================================================
+    # ORDER / FIELDS
+    # ==========================================================
     members = members.only(
-        "id", "name", "phone", "join_date",
-        "expiry_date", "status", "photo",
-        "branch__name", "plan__name","admission_number"
+        "id",
+        "name",
+        "phone",
+        "join_date",
+        "expiry_date",
+        "status",
+        "photo",
+        "branch__name",
+        "plan__name",
+        "admission_number"
     ).order_by("-id")
 
-    # 🔽 Send branches for dropdown
-    branches = gym.branches.all()
-    
+    # ==========================================================
+    # 🔽 BRANCH DROPDOWN
+    # ADMIN → ALL BRANCHES
+    # TRAINER → ONLY ASSIGNED BRANCH
+    # ==========================================================
+    if request.user.role == "TRAINER":
+
+        if request.user.branch_id:
+            branches = gym.branches.filter(
+                id=request.user.branch_id
+            )
+        else:
+            branches = gym.branches.none()
+
+    else:
+        # ADMIN
+        branches = gym.branches.all()
+
+    # ==========================================================
+    # RESPONSE
+    # ==========================================================
     return render(request, "List_members.html", {
         "members": members,
         "branches": branches,
@@ -739,7 +983,6 @@ def member_list(request):
         "whatsapp_url": whatsapp_url,
         "invoice_id": invoice_id
     })
-    
 
 @login_required
 @owner_or_trainer
@@ -1382,17 +1625,46 @@ def renewals_page(request):
     update_member_statuses(gym)
     today = timezone.localdate()
 
-    # filters
+    # -------------------------
+    # FILTERS
+    # -------------------------
     q = request.GET.get("q", "").strip()
     branch_id = request.GET.get("branch", "").strip()
-
-    # dropdown value should be: active / expiring / expired / all
     status = request.GET.get("status", "expiring").strip()
 
-    # base queryset
-    members = Member.objects.filter(gym=gym , is_deleted=False).select_related("branch", "plan")
+    # -------------------------
+    # BASE QUERYSET
+    # -------------------------
+    members = (
+        Member.objects
+        .filter(
+            gym=gym,
+            is_deleted=False
+        )
+        .select_related("branch", "plan")
+    )
 
-    # search by name OR phone
+    # ==========================================================
+    # TRAINER → ONLY ASSIGNED BRANCH
+    # ADMIN → ALL BRANCHES
+    # ==========================================================
+    if request.user.role == "TRAINER":
+        if request.user.branch_id:
+            members = members.filter(
+                branch_id=request.user.branch_id
+            )
+
+            # Prevent URL manipulation such as ?branch=another_branch
+            branch_id = str(request.user.branch_id)
+
+        else:
+            # Trainer without branch → no data
+            members = members.none()
+            branch_id = ""
+
+    # -------------------------
+    # SEARCH
+    # -------------------------
     if q:
         members = members.filter(
             Q(name__icontains=q) |
@@ -1400,25 +1672,60 @@ def renewals_page(request):
             Q(admission_number__icontains=q)
         )
 
-    # branch filter
+    # -------------------------
+    # BRANCH FILTER
+    # -------------------------
+    # ADMIN can filter by any branch in their gym.
+    # TRAINER is already restricted above.
     if branch_id:
-        members = members.filter(branch_id=branch_id)
+        members = members.filter(
+            branch_id=branch_id
+        )
 
-    # expiring window
+    # -------------------------
+    # EXPIRING WINDOW
+    # -------------------------
     days = gym.expiry_reminder_days_before or 7
     expiring_limit = today + timedelta(days=days)
 
-    # filter by status (based on expiry_date = source of truth)
+    # -------------------------
+    # STATUS FILTER
+    # -------------------------
     if status == "expired":
-        members = members.filter(expiry_date__lt=today)
+        members = members.filter(
+            expiry_date__lt=today
+        )
+
     elif status == "expiring":
-        members = members.filter(expiry_date__gte=today, expiry_date__lte=expiring_limit)
+        members = members.filter(
+            expiry_date__gte=today,
+            expiry_date__lte=expiring_limit
+        )
+
     elif status == "active":
-        members = members.filter(expiry_date__gt=expiring_limit)
+        members = members.filter(
+            expiry_date__gt=expiring_limit
+        )
+
     elif status == "all":
         pass
 
-    branches = Branch.objects.filter(gym=gym).order_by("name")
+    # -------------------------
+    # BRANCH DROPDOWN
+    # -------------------------
+    if request.user.role == "TRAINER":
+        if request.user.branch_id:
+            branches = Branch.objects.filter(
+                gym=gym,
+                id=request.user.branch_id
+            ).order_by("name")
+        else:
+            branches = Branch.objects.none()
+    else:
+        # ADMIN → all branches
+        branches = Branch.objects.filter(
+            gym=gym
+        ).order_by("name")
 
     context = {
         "members": members.order_by("expiry_date"),
@@ -1429,10 +1736,8 @@ def renewals_page(request):
         "today": today,
         "expiring_limit": expiring_limit,
     }
-    print(context)
 
     return render(request, "renewals.html", context)
-
 
 
 @login_required
@@ -1440,70 +1745,161 @@ def renewals_page(request):
 def paid_members_page(request):
     gym = request.user.gym
 
-    today = date.today()
-    month = int(request.GET.get("month", today.month))
-    year = int(request.GET.get("year", today.year))
+    today = timezone.localdate()
+
+    month = int(
+        request.GET.get("month", today.month)
+    )
+
+    year = int(
+        request.GET.get("year", today.year)
+    )
 
     q = request.GET.get("q", "").strip()
     branch_id = request.GET.get("branch", "").strip()
 
-    # Base payments for month/year
+    # ==========================================================
+    # BASE PAYMENT QUERYSET
+    # ==========================================================
     payments = (
         Payment.objects
-        .filter(gym=gym, payment_date__year=year, payment_date__month=month)
-        .select_related("member", "member__branch")
+        .filter(
+            gym=gym,
+            payment_date__year=year,
+            payment_date__month=month
+        )
+        .select_related(
+            "member",
+            "member__branch"
+        )
     )
 
-    if branch_id:
-        payments = payments.filter(member__branch_id=branch_id)
+    # ==========================================================
+    # TRAINER → ONLY ASSIGNED BRANCH PAYMENTS
+    # ADMIN → ALL BRANCH PAYMENTS
+    # ==========================================================
+    if request.user.role == "TRAINER":
 
+        if request.user.branch_id:
+            payments = payments.filter(
+                member__branch_id=request.user.branch_id
+            )
+
+            # Prevent URL manipulation
+            branch_id = str(request.user.branch_id)
+
+        else:
+            # Trainer without branch → no payment data
+            payments = payments.none()
+            branch_id = ""
+
+    # -------------------------
+    # BRANCH FILTER
+    # -------------------------
+    if branch_id:
+        payments = payments.filter(
+            member__branch_id=branch_id
+        )
+
+    # -------------------------
+    # SEARCH
+    # -------------------------
     if q:
         payments = payments.filter(
             Q(member__name__icontains=q) |
             Q(member__phone__icontains=q) |
-            Q(member__admission_number__icontains=q)  # ✅ NEW
+            Q(member__admission_number__icontains=q)
         )
 
-    # ✅ Aggregate by member (one row per member)
+    # ==========================================================
+    # AGGREGATE BY MEMBER
+    # ==========================================================
     member_totals = (
-    payments
-    .values("member_id")
-    .annotate(
-        total_paid=Coalesce(
-            Sum("amount"),
-            Value(0),
-            output_field=DecimalField(max_digits=8, decimal_places=2)
-        ),
-        last_payment=Max("payment_date"),
+        payments
+        .values("member_id")
+        .annotate(
+            total_paid=Coalesce(
+                Sum("amount"),
+                Value(0),
+                output_field=DecimalField(
+                    max_digits=8,
+                    decimal_places=2
+                )
+            ),
+            last_payment=Max("payment_date"),
+        )
     )
-)
 
-    # Subquery to attach totals to each member
+    # -------------------------
+    # SUBQUERIES
+    # -------------------------
     total_paid_sq = Subquery(
-        member_totals.filter(member_id=OuterRef("pk")).values("total_paid")[:1]
-    )
-    last_payment_sq = Subquery(
-        member_totals.filter(member_id=OuterRef("pk")).values("last_payment")[:1]
+        member_totals
+        .filter(member_id=OuterRef("pk"))
+        .values("total_paid")[:1]
     )
 
-    # ✅ Get members list with photo.url available
+    last_payment_sq = Subquery(
+        member_totals
+        .filter(member_id=OuterRef("pk"))
+        .values("last_payment")[:1]
+    )
+
+    # ==========================================================
+    # MEMBERS WITH PAYMENTS
+    # ==========================================================
     members_qs = (
         Member.objects
-        .filter(gym=gym, payments__in=payments, is_deleted=False)
-        .select_related("branch", "plan")
+        .filter(
+            gym=gym,
+            payments__in=payments,
+            is_deleted=False
+        )
+        .select_related(
+            "branch",
+            "plan"
+        )
         .distinct()
         .annotate(
             total_paid=total_paid_sq,
             last_payment=last_payment_sq,
         )
-        .order_by("-total_paid", "name")
+        .order_by(
+            "-total_paid",
+            "name"
+        )
     )
 
-    total_collection = payments.aggregate(total=Sum("amount"))["total"] or 0
-    branches = Branch.objects.filter(gym=gym).order_by("name")
+    # -------------------------
+    # TOTAL COLLECTION
+    # -------------------------
+    total_collection = (
+        payments.aggregate(
+            total=Sum("amount")
+        )["total"] or 0
+    )
+
+    # -------------------------
+    # BRANCH DROPDOWN
+    # -------------------------
+    if request.user.role == "TRAINER":
+
+        if request.user.branch_id:
+            branches = Branch.objects.filter(
+                gym=gym,
+                id=request.user.branch_id
+            ).order_by("name")
+        else:
+            branches = Branch.objects.none()
+
+    else:
+        # ADMIN → all branches
+        branches = Branch.objects.filter(
+            gym=gym
+        ).order_by("name")
 
     context = {
-        "paid_members": members_qs,   # ✅ now each item is a Member object
+        "paid_members": members_qs,
         "branches": branches,
         "q": q,
         "branch_id": branch_id,
@@ -1511,26 +1907,68 @@ def paid_members_page(request):
         "year": year,
         "total_collection": total_collection,
     }
-    return render(request, "paid_members.html", context)
+
+    return render(
+        request,
+        "paid_members.html",
+        context
+    )
+
 
 @login_required
 @owner_or_trainer
 def unpaid_members_page(request):
     gym = request.user.gym
     today = timezone.localdate()
+
     days = gym.expiry_reminder_days_before or 7
     alert_limit = today + timedelta(days=days)
 
+    # -------------------------
+    # FILTERS
+    # -------------------------
     q = request.GET.get("q", "").strip()
     branch_id = request.GET.get("branch", "").strip()
-    status = request.GET.get("status", "all").strip()   # expired / expiring / all
+    status = request.GET.get("status", "all").strip()
 
-    members = Member.objects.filter(
-        gym=gym,
-        expiry_date__lte=alert_limit,  # includes expiring + expired
-        is_deleted=False
-    ).select_related("branch", "plan")
+    # ==========================================================
+    # BASE MEMBER QUERYSET
+    # ==========================================================
+    members = (
+        Member.objects
+        .filter(
+            gym=gym,
+            expiry_date__lte=alert_limit,
+            is_deleted=False
+        )
+        .select_related(
+            "branch",
+            "plan"
+        )
+    )
 
+    # ==========================================================
+    # TRAINER → ONLY ASSIGNED BRANCH
+    # ADMIN → ALL BRANCHES
+    # ==========================================================
+    if request.user.role == "TRAINER":
+
+        if request.user.branch_id:
+            members = members.filter(
+                branch_id=request.user.branch_id
+            )
+
+            # Prevent URL manipulation
+            branch_id = str(request.user.branch_id)
+
+        else:
+            # Trainer without branch → no member data
+            members = members.none()
+            branch_id = ""
+
+    # -------------------------
+    # SEARCH
+    # -------------------------
     if q:
         members = members.filter(
             Q(name__icontains=q) |
@@ -1538,16 +1976,48 @@ def unpaid_members_page(request):
             Q(admission_number__icontains=q)
         )
 
+    # -------------------------
+    # BRANCH FILTER
+    # -------------------------
     if branch_id:
-        members = members.filter(branch_id=branch_id)
+        members = members.filter(
+            branch_id=branch_id
+        )
 
-    # status filter inside unpaid window
+    # -------------------------
+    # STATUS FILTER
+    # -------------------------
     if status == "expired":
-        members = members.filter(expiry_date__lt=today)
-    elif status == "expiring":
-        members = members.filter(expiry_date__gte=today, expiry_date__lte=alert_limit)
 
-    branches = Branch.objects.filter(gym=gym).order_by("name")
+        members = members.filter(
+            expiry_date__lt=today
+        )
+
+    elif status == "expiring":
+
+        members = members.filter(
+            expiry_date__gte=today,
+            expiry_date__lte=alert_limit
+        )
+
+    # -------------------------
+    # BRANCH DROPDOWN
+    # -------------------------
+    if request.user.role == "TRAINER":
+
+        if request.user.branch_id:
+            branches = Branch.objects.filter(
+                gym=gym,
+                id=request.user.branch_id
+            ).order_by("name")
+        else:
+            branches = Branch.objects.none()
+
+    else:
+        # ADMIN → all branches
+        branches = Branch.objects.filter(
+            gym=gym
+        ).order_by("name")
 
     context = {
         "members": members.order_by("expiry_date"),
@@ -1558,7 +2028,12 @@ def unpaid_members_page(request):
         "today": today,
         "alert_limit": alert_limit,
     }
-    return render(request, "unpaid_members.html", context)
+
+    return render(
+        request,
+        "unpaid_members.html",
+        context
+    )
 
 @login_required
 @owner_required
@@ -1752,24 +2227,61 @@ from django.db.models import (
     DecimalField, ExpressionWrapper
 )
 from django.db.models.functions import Coalesce, Greatest
+
 @login_required
 @owner_or_trainer
 def pending_payments_page(request):
+    print("!!!!!")
+
     gym = request.user.gym
+
     q = (request.GET.get("q") or "").strip()
     branch_id = (request.GET.get("branch") or "").strip()
 
     money = DecimalField(max_digits=10, decimal_places=2)
-    zero = Value(Decimal("0.00"))
+    zero = Value(Decimal("0.00"), output_field=money)
 
-    # Base queryset
+    # ==========================================================
+    # BASE MEMBER QUERYSET
+    # ==========================================================
     members_qs = (
         Member.objects
-        .filter(gym=gym, plan__isnull=False)
-        .select_related("plan", "branch")
+        .filter(
+            gym=gym,
+            plan__isnull=False
+        )
+        .select_related(
+            "plan",
+            "branch"
+        )
     )
 
-    # ✅ SEARCH FILTER
+    # ==========================================================
+    # TRAINER → ONLY ASSIGNED BRANCH
+    # ADMIN → ALL BRANCHES
+    # ==========================================================
+    if request.user.role == "TRAINER":
+
+        if request.user.branch_id:
+
+            # Force trainer to their assigned branch
+            members_qs = members_qs.filter(
+                branch_id=request.user.branch_id
+            )
+
+            # Prevent URL manipulation:
+            # ?branch=another_branch
+            branch_id = str(request.user.branch_id)
+
+        else:
+
+            # Trainer without assigned branch → no data
+            members_qs = members_qs.none()
+            branch_id = ""
+
+    # ==========================================================
+    # SEARCH FILTER
+    # ==========================================================
     if q:
         members_qs = members_qs.filter(
             Q(name__icontains=q) |
@@ -1777,11 +2289,19 @@ def pending_payments_page(request):
             Q(admission_number__icontains=q)
         )
 
-    # ✅ BRANCH FILTER
+    # ==========================================================
+    # BRANCH FILTER
+    # ADMIN can filter within their gym.
+    # TRAINER is already restricted to assigned branch.
+    # ==========================================================
     if branch_id:
-        members_qs = members_qs.filter(branch_id=branch_id)
+        members_qs = members_qs.filter(
+            branch_id=branch_id
+        )
 
-    # ✅ Paid Subquery
+    # ==========================================================
+    # PAID SUBQUERY
+    # ==========================================================
     paid_subq = (
         Payment.objects
         .filter(
@@ -1791,11 +2311,19 @@ def pending_payments_page(request):
             coverage_end=OuterRef("expiry_date"),
         )
         .values("member_id")
-        .annotate(s=Coalesce(Sum("amount"), zero))
+        .annotate(
+            s=Coalesce(
+                Sum("amount"),
+                zero,
+                output_field=money
+            )
+        )
         .values("s")[:1]
     )
 
-    # ✅ Discount Subquery
+    # ==========================================================
+    # DISCOUNT SUBQUERY
+    # ==========================================================
     discount_subq = (
         Payment.objects
         .filter(
@@ -1805,27 +2333,69 @@ def pending_payments_page(request):
             coverage_end=OuterRef("expiry_date"),
         )
         .values("member_id")
-        .annotate(d=Coalesce(Max("discount_amount"), zero))
+        .annotate(
+            d=Coalesce(
+                Max("discount_amount"),
+                zero,
+                output_field=money
+            )
+        )
         .values("d")[:1]
     )
 
-    # ✅ Final calculations
+    # ==========================================================
+    # FINAL CALCULATIONS
+    # ==========================================================
     members_qs = (
         members_qs
         .annotate(
-            plan_price=Coalesce(F("plan__price"), zero),
-            paid_total=Coalesce(Subquery(paid_subq), zero),
-            discount_amount=Coalesce(Subquery(discount_subq), zero),
+            plan_price=Coalesce(
+                F("plan__price"),
+                zero,
+                output_field=money
+            ),
+
+            paid_total=Coalesce(
+                Subquery(
+                    paid_subq,
+                    output_field=money
+                ),
+                zero,
+                output_field=money
+            ),
+
+            discount_amount=Coalesce(
+                Subquery(
+                    discount_subq,
+                    output_field=money
+                ),
+                zero,
+                output_field=money
+            ),
         )
         .annotate(
-            final_amount=Greatest(F("plan_price") - F("discount_amount"), zero),
-            balance=Greatest(F("final_amount") - F("paid_total"), zero),
+            final_amount=Greatest(
+                F("plan_price") - F("discount_amount"),
+                zero
+            ),
+
+            balance=Greatest(
+                F("final_amount") - F("paid_total"),
+                zero
+            ),
         )
-        .filter(balance__gt=0)
-        .order_by("-balance", "name")
+        .filter(
+            balance__gt=0
+        )
+        .order_by(
+            "-balance",
+            "name"
+        )
     )
 
-    # Convert to template-friendly list
+    # ==========================================================
+    # TEMPLATE-FRIENDLY LIST
+    # ==========================================================
     pending_list = [
         {
             "member_id": m.id,
@@ -1842,17 +2412,47 @@ def pending_payments_page(request):
         for m in members_qs
     ]
 
-    branches = Branch.objects.filter(gym=gym).order_by("name")
+    # ==========================================================
+    # BRANCH DROPDOWN
+    # ==========================================================
+    if request.user.role == "TRAINER":
 
-    total_pending = sum((x["balance"] for x in pending_list), Decimal("0.00"))
+        if request.user.branch_id:
+            branches = Branch.objects.filter(
+                gym=gym,
+                id=request.user.branch_id
+            ).order_by("name")
+        else:
+            branches = Branch.objects.none()
 
-    return render(request, "pending_payments.html", {
-        "pending_list": pending_list,
-        "branches": branches,
-        "q": q,
-        "branch_id": branch_id,
-        "total_pending": total_pending,
-    })
+    else:
+        # ADMIN → all branches
+        branches = Branch.objects.filter(
+            gym=gym
+        ).order_by("name")
+
+    # ==========================================================
+    # TOTAL PENDING
+    # ==========================================================
+    total_pending = sum(
+        (x["balance"] for x in pending_list),
+        Decimal("0.00")
+    )
+
+    # ==========================================================
+    # CONTEXT
+    # ==========================================================
+    return render(
+        request,
+        "pending_payments.html",
+        {
+            "pending_list": pending_list,
+            "branches": branches,
+            "q": q,
+            "branch_id": branch_id,
+            "total_pending": total_pending,
+        }
+    )
 
 from django.db import transaction
 @login_required
@@ -2477,7 +3077,7 @@ def whatsapp_conf(request):
         wa_template_birthday=request.POST.get("wa_template_birthday", "").strip()
         birthday_reminder_days_before=request.POST.get("birthday_reminder_days_before", "").strip()
         wa_template_birthday_today=request.POST.get("wa_template_birthday_today", "").strip()
-        
+  
         if reminder_days:
             reminder_days = int(reminder_days)
         else:
